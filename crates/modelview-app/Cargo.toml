@@ -1,0 +1,25 @@
+[package]
+name = "modelview-app"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "modelview"
+path = "src/main.rs"
+
+[dependencies]
+modelview-core = { path = "../modelview-core" }
+anyhow.workspace = true
+glam.workspace = true
+rayon.workspace = true
+serde.workspace = true
+eframe = { version = "0.37", features = ["persistence"] }
+egui = "0.37"
+bytemuck = { version = "1.25", features = ["derive"] }
+rfd = "0.15"
+image = { version = "0.25", default-features = false, features = ["png"] }
+
+[dev-dependencies]
+serde_json = "1"

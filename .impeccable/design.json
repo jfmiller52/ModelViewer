@@ -1,0 +1,773 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-25T21:24:43Z",
+  "title": "Design System: ModelView",
+  "extensions": {
+    "colorMeta": {
+      "black": {
+        "role": "neutral",
+        "displayName": "Black Field",
+        "canonical": "#000000",
+        "tonalRamp": [
+          "#000000",
+          "#000000",
+          "#000000",
+          "#000000",
+          "#1A1A1A",
+          "#4F4F4F",
+          "#838383",
+          "#B8B8B8"
+        ]
+      },
+      "ash": {
+        "role": "neutral",
+        "displayName": "Ash",
+        "canonical": "#05080C",
+        "tonalRamp": [
+          "#010203",
+          "#020406",
+          "#030608",
+          "#04070B",
+          "#1F2125",
+          "#525457",
+          "#868789",
+          "#B9BABB"
+        ]
+      },
+      "ash-high": {
+        "role": "neutral",
+        "displayName": "Ash High",
+        "canonical": "#0A1220",
+        "tonalRamp": [
+          "#030509",
+          "#050910",
+          "#070C16",
+          "#09101D",
+          "#232A37",
+          "#565B65",
+          "#888C93",
+          "#BABDC1"
+        ]
+      },
+      "white": {
+        "role": "neutral",
+        "displayName": "White",
+        "canonical": "#FFFFFF",
+        "tonalRamp": [
+          "#474747",
+          "#7C7C7C",
+          "#B0B0B0",
+          "#E5E5E5",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF"
+        ]
+      },
+      "graphite": {
+        "role": "neutral",
+        "displayName": "Graphite",
+        "canonical": "#A7B3BF",
+        "tonalRamp": [
+          "#2F3235",
+          "#51575D",
+          "#737C84",
+          "#96A1AB",
+          "#B0BBC6",
+          "#C2CAD3",
+          "#D4DAE0",
+          "#E6EAED"
+        ]
+      },
+      "graphite-faint": {
+        "role": "neutral",
+        "displayName": "Graphite Faint",
+        "canonical": "#5C6B78",
+        "tonalRamp": [
+          "#1A1E22",
+          "#2D343A",
+          "#404A53",
+          "#53606C",
+          "#6D7A86",
+          "#8E99A2",
+          "#B0B7BD",
+          "#D1D6D9"
+        ]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#161E28",
+        "tonalRamp": [
+          "#06080B",
+          "#0B0F13",
+          "#0F151C",
+          "#141B24",
+          "#2E353E",
+          "#5E636A",
+          "#8E9297",
+          "#BEC0C3"
+        ]
+      },
+      "hairline-bright": {
+        "role": "neutral",
+        "displayName": "Hairline Bright",
+        "canonical": "#263545",
+        "tonalRamp": [
+          "#0B0F13",
+          "#121A22",
+          "#1A2530",
+          "#22303E",
+          "#3C4A58",
+          "#69737E",
+          "#969DA5",
+          "#C2C6CB"
+        ]
+      },
+      "blue": {
+        "role": "primary",
+        "displayName": "Electric Blue",
+        "canonical": "#2F6BFF",
+        "tonalRamp": [
+          "#0D1E47",
+          "#17347C",
+          "#204AB0",
+          "#2A60E5",
+          "#447AFF",
+          "#6F99FF",
+          "#9AB7FF",
+          "#C5D6FF"
+        ]
+      },
+      "blue-dim": {
+        "role": "primary",
+        "displayName": "Blue Dim",
+        "canonical": "#0A1730",
+        "tonalRamp": [
+          "#03060D",
+          "#050B17",
+          "#071021",
+          "#09152B",
+          "#232F45",
+          "#565F70",
+          "#888E9A",
+          "#BABEC5"
+        ]
+      },
+      "scroll-hover": {
+        "role": "neutral",
+        "displayName": "Scroll Hover",
+        "canonical": "#2A3B4E",
+        "tonalRamp": [
+          "#0C1116",
+          "#141D26",
+          "#1D2936",
+          "#263546",
+          "#404F60",
+          "#6C7785",
+          "#98A0A9",
+          "#C3C8CD"
+        ]
+      },
+      "scroll-active": {
+        "role": "neutral",
+        "displayName": "Scroll Active",
+        "canonical": "#344B62",
+        "tonalRamp": [
+          "#0F151B",
+          "#192430",
+          "#243444",
+          "#2F4358",
+          "#495E72",
+          "#738392",
+          "#9CA8B3",
+          "#C6CDD3"
+        ]
+      },
+      "signal-red": {
+        "role": "secondary",
+        "displayName": "Signal Red",
+        "canonical": "#FF5A5F",
+        "tonalRamp": [
+          "#47191B",
+          "#7C2C2E",
+          "#B03E42",
+          "#E55155",
+          "#FF6B6F",
+          "#FF8D90",
+          "#FFAFB1",
+          "#FFD1D2"
+        ]
+      },
+      "signal-red-text": {
+        "role": "secondary",
+        "displayName": "Signal Red Text",
+        "canonical": "#FF8A8A",
+        "tonalRamp": [
+          "#472727",
+          "#7C4343",
+          "#B05F5F",
+          "#E57C7C",
+          "#FF9696",
+          "#FFAEAE",
+          "#FFC6C6",
+          "#FFDEDE"
+        ]
+      },
+      "amber": {
+        "role": "secondary",
+        "displayName": "Amber",
+        "canonical": "#F5A524",
+        "tonalRamp": [
+          "#452E0A",
+          "#775011",
+          "#A97219",
+          "#DC9420",
+          "#F6AE3B",
+          "#F8C168",
+          "#FAD395",
+          "#FCE6C2"
+        ]
+      },
+      "teal": {
+        "role": "tertiary",
+        "displayName": "Teal",
+        "canonical": "#14B8A6",
+        "tonalRamp": [
+          "#06342E",
+          "#0A5951",
+          "#0E7F73",
+          "#12A595",
+          "#2CBFAF",
+          "#5DCEC1",
+          "#8DDDD4",
+          "#BDEBE6"
+        ]
+      },
+      "violet": {
+        "role": "tertiary",
+        "displayName": "Violet",
+        "canonical": "#A78BFA",
+        "tonalRamp": [
+          "#2F2746",
+          "#514479",
+          "#7360AD",
+          "#967DE0",
+          "#B097FB",
+          "#C2AFFC",
+          "#D4C7FD",
+          "#E6DFFE"
+        ]
+      },
+      "red-line": {
+        "role": "secondary",
+        "displayName": "Red Line",
+        "canonical": "#D92D20",
+        "tonalRamp": [
+          "#3D0D09",
+          "#691610",
+          "#961F16",
+          "#C3281D",
+          "#DD4337",
+          "#E56E65",
+          "#ED9993",
+          "#F4C4C1"
+        ]
+      },
+      "amber-line": {
+        "role": "secondary",
+        "displayName": "Amber Line",
+        "canonical": "#B45309",
+        "tonalRamp": [
+          "#321703",
+          "#572804",
+          "#7C3906",
+          "#A14A08",
+          "#BC6522",
+          "#CB8855",
+          "#DBAB88",
+          "#EACFBA"
+        ]
+      },
+      "teal-line": {
+        "role": "tertiary",
+        "displayName": "Teal Line",
+        "canonical": "#0F766E",
+        "tonalRamp": [
+          "#04211F",
+          "#073935",
+          "#0A524C",
+          "#0D6A63",
+          "#28847D",
+          "#59A09B",
+          "#8ABCB9",
+          "#BCD9D6"
+        ]
+      },
+      "violet-line": {
+        "role": "tertiary",
+        "displayName": "Violet Line",
+        "canonical": "#6D28D9",
+        "tonalRamp": [
+          "#1F0B3D",
+          "#351369",
+          "#4B1C96",
+          "#6224C3",
+          "#7C3EDD",
+          "#9A6AE5",
+          "#B897ED",
+          "#D6C3F4"
+        ]
+      },
+      "clay-light": {
+        "role": "material",
+        "displayName": "Clay Light",
+        "canonical": "#D3DCE6",
+        "tonalRamp": [
+          "#3B3E40",
+          "#666B70",
+          "#92989F",
+          "#BDC5CE",
+          "#D8E0E9",
+          "#E1E7EE",
+          "#EAEEF3",
+          "#F3F5F8"
+        ]
+      },
+      "clay-blue": {
+        "role": "material",
+        "displayName": "Clay Blue",
+        "canonical": "#9DB2C8",
+        "tonalRamp": [
+          "#2C3238",
+          "#4C5661",
+          "#6D7B8A",
+          "#8DA0B3",
+          "#A7BACE",
+          "#BBCAD9",
+          "#CFDAE4",
+          "#E4E9F0"
+        ]
+      },
+      "clay-mist": {
+        "role": "material",
+        "displayName": "Clay Mist",
+        "canonical": "#C2CCD8",
+        "tonalRamp": [
+          "#36393C",
+          "#5E6369",
+          "#868D95",
+          "#AEB7C2",
+          "#C8D1DC",
+          "#D5DCE4",
+          "#E1E6EC",
+          "#EEF1F4"
+        ]
+      },
+      "clay-slate": {
+        "role": "material",
+        "displayName": "Clay Slate",
+        "canonical": "#7891A8",
+        "tonalRamp": [
+          "#22292F",
+          "#3A4652",
+          "#536474",
+          "#6C8297",
+          "#869CB1",
+          "#A2B3C3",
+          "#BDCAD5",
+          "#D9E0E7"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "wordmark": {
+        "displayName": "Wordmark",
+        "purpose": "First-run title sheet only; 76px condensed tracked caps."
+      },
+      "verdict": {
+        "displayName": "Verdict",
+        "purpose": "The one large datum on a loaded file; 44px."
+      },
+      "section-label": {
+        "displayName": "Section Label",
+        "purpose": "Section locators, tags, rail labels and chips."
+      },
+      "row-label": {
+        "displayName": "Row Label",
+        "purpose": "Check and object names."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Report sentences and error messages."
+      },
+      "data": {
+        "displayName": "Data",
+        "purpose": "Bounding box, measurements and object values."
+      },
+      "control": {
+        "displayName": "Control",
+        "purpose": "Button labels and view segments."
+      },
+      "meta": {
+        "displayName": "Meta",
+        "purpose": "File meta, timings, state lines and sublines."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "instant",
+        "value": "0ms",
+        "purpose": "No authored transition; focus and state changes are immediate, and windows do not fade in."
+      },
+      {
+        "name": "egui-animation-clock",
+        "value": "120ms",
+        "purpose": "Residual egui animation clock; not used for report, row, or overlay state."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "compact",
+        "value": "1024px"
+      },
+      {
+        "name": "standard",
+        "value": "1440px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Action Button",
+      "kind": "button",
+      "refersTo": "action-primary",
+      "description": "The filled blue action, used while no file is ready or for error recovery.",
+      "html": "<button class=\"ds-btn-primary\">OPEN FILE</button>",
+      "css": ".ds-btn-primary{background:#2F6BFF;color:#FFFFFF;border:1px solid #2F6BFF;border-radius:0;padding:9px 18px;height:36px;font:600 13px/1 \"Archivo Narrow\",sans-serif;letter-spacing:.128em;text-transform:uppercase;cursor:pointer}.ds-btn-primary:hover{filter:brightness(1.06)}.ds-btn-primary:focus-visible{outline:1px solid #2F6BFF;outline-offset:2px}"
+    },
+    {
+      "name": "Outlined Action Button",
+      "kind": "button",
+      "refersTo": "action-outline",
+      "description": "The loaded-state Open action: black fill, electric blue border and dash, white label.",
+      "html": "<button class=\"ds-btn-outline\"><i></i>OPEN FILE</button>",
+      "css": ".ds-btn-outline{display:inline-flex;align-items:center;gap:10px;height:36px;padding:0 18px;background:#000000;color:#FFFFFF;border:1px solid #2F6BFF;border-radius:0;font:600 12.5px/1 \"Archivo Narrow\",sans-serif;letter-spacing:.128em;text-transform:uppercase;cursor:pointer}.ds-btn-outline i{display:block;width:16px;height:1px;background:#2F6BFF}.ds-btn-outline:hover{background:#05080C}.ds-btn-outline:focus-visible{outline:1px solid #2F6BFF;outline-offset:2px}"
+    },
+    {
+      "name": "View Segment",
+      "kind": "nav",
+      "refersTo": "view-segment",
+      "description": "BambuStudio-style camera presets; the active preset carries a blue border and underline.",
+      "html": "<div class=\"ds-seg\"><span class=\"ds-seg-item is-active\">HOME</span><span class=\"ds-seg-item\">TOP</span><span class=\"ds-seg-item\">FRONT</span></div>",
+      "css": ".ds-seg{display:flex;border:1px solid #161E28;border-radius:0;width:max-content}.ds-seg-item{display:grid;place-items:center;width:58px;height:34px;color:#A7B3BF;font:600 12px/1 \"Archivo Narrow\",sans-serif;letter-spacing:.117em;text-transform:uppercase;border-right:1px solid #161E28}.ds-seg-item:last-child{border-right:0}.ds-seg-item.is-active{background:#05080C;color:#FFFFFF;border-right-color:#263545;box-shadow:inset 0 -2px 0 #2F6BFF}.ds-seg-item:hover{color:#FFFFFF}"
+    },
+    {
+      "name": "Viewport Tag",
+      "kind": "chip",
+      "refersTo": "tag-chip",
+      "description": "Instrument chip for format, counts, grid state and defect count.",
+      "html": "<span class=\"ds-chip\">GRID ON</span>",
+      "css": ".ds-chip{display:inline-flex;align-items:center;height:26px;padding:0 9px;background:#000000;color:#FFFFFF;border:1px solid #263545;border-radius:0;font:600 12px/1 \"Archivo Narrow\",sans-serif;letter-spacing:.125em;text-transform:uppercase}"
+    },
+    {
+      "name": "Check Row",
+      "kind": "custom",
+      "refersTo": "check-row",
+      "description": "A printability check with a rail state mark, explanation and right-aligned value.",
+      "html": "<div class=\"ds-check ds-fail\"><span class=\"ds-mark\"></span><div><b>Closed surface</b><small>Every edge joins exactly two faces</small></div><em>24 open</em></div>",
+      "css": ".ds-check{display:grid;grid-template-columns:1fr auto;align-items:center;min-height:46px;border-bottom:1px solid #161E28;color:#FFFFFF;font-family:\"Archivo Narrow\",sans-serif;position:relative}.ds-check b{display:block;font-size:15px;font-weight:500}.ds-check small{display:block;font-size:12.5px;color:#A7B3BF;font-weight:400}.ds-check em{font-style:normal;font-size:13.5px;font-weight:600;color:#FFFFFF}.ds-check.ds-fail em{color:#FF8A8A}.ds-check .ds-mark{position:absolute;left:-28px;width:22px;height:1px;background:#FFFFFF}.ds-check.ds-fail .ds-mark{height:4px;border-top:1px solid #FF5A5F;border-bottom:1px solid #FF5A5F;background:transparent}"
+    },
+    {
+      "name": "Object Row",
+      "kind": "custom",
+      "refersTo": "object-row",
+      "description": "A scene object with visibility square, triangle count and closed/defect state.",
+      "html": "<div class=\"ds-object is-selected\"><span class=\"ds-vis\"></span><div><b>Torus ring</b><small>5,760 TRIANGLES</small></div><em>CLOSED</em></div>",
+      "css": ".ds-object{display:grid;grid-template-columns:18px 1fr auto;gap:9px;align-items:center;height:54px;border-bottom:1px solid #161E28;padding:0 4px;font-family:\"Archivo Narrow\",sans-serif;color:#FFFFFF}.ds-object.is-selected{background:#05080C;border-bottom-color:#2F6BFF}.ds-object .ds-vis{width:14px;height:14px;border:1px solid #FFFFFF;background:linear-gradient(#FFFFFF,#FFFFFF) center/7px 7px no-repeat}.ds-object b{display:block;font-size:15px;font-weight:500}.ds-object small{display:block;font-size:11px;color:#A7B3BF}.ds-object em{font-style:normal;font-size:11.5px;font-weight:600;color:#A7B3BF}.ds-object em.bad{color:#FF8A8A}"
+    },
+    {
+      "name": "Index Rail Tick",
+      "kind": "nav",
+      "refersTo": "rail-tick",
+      "description": "One calibrated rail tick; the active tick owns the electric blue rule.",
+      "html": "<div class=\"ds-rail\"><span class=\"ds-rail-tick is-active\"><b>01</b><small>VERDICT</small></span><span class=\"ds-rail-tick\"><b>02</b><small>CHECKS</small></span></div>",
+      "css": ".ds-rail{width:76px;background:#000000;border-right:1px solid #161E28;font-family:\"Archivo Narrow\",sans-serif}.ds-rail-tick{display:grid;place-items:center;height:58px;border-bottom:1px solid #161E28;color:#A7B3BF;position:relative}.ds-rail-tick::before{content:\"\";position:absolute;left:0;top:50%;width:14px;height:1px;background:#263545}.ds-rail-tick b{font-size:13px;font-weight:500;letter-spacing:.14em}.ds-rail-tick small{font-size:10px;font-weight:600;letter-spacing:.1em;color:#A7B3BF}.ds-rail-tick.is-active{color:#FFFFFF}.ds-rail-tick.is-active::before{width:30px;background:#2F6BFF}.ds-rail-tick.is-active::after{content:\"\";position:absolute;left:0;right:0;bottom:0;height:1px;background:#2F6BFF}"
+    },
+    {
+      "name": "Section Head",
+      "kind": "custom",
+      "description": "The 0N / SECTION locator with an optional right-aligned meta and a hairline.",
+      "html": "<div class=\"ds-section\"><span>02 / CHECKS</span><em>6 RUN</em></div>",
+      "css": ".ds-section{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid #161E28;padding-bottom:8px;font-family:\"Archivo Narrow\",sans-serif}.ds-section span{font-size:11.5px;font-weight:600;letter-spacing:.19em;color:#A7B3BF;text-transform:uppercase}.ds-section em{font-style:normal;font-size:11.5px;color:#A7B3BF;letter-spacing:.148em;text-transform:uppercase}"
+    },
+    {
+      "name": "Defect Callout",
+      "kind": "custom",
+      "refersTo": "defect-callout",
+      "description": "The signature 28px locator that binds a mesh defect to its legend ink.",
+      "html": "<button class=\"ds-callout\">1</button>",
+      "css": ".ds-callout{width:28px;height:28px;border-radius:50%;background:#000000;border:1px solid #FF5A5F;color:#FF8A8A;font:600 12px/1 \"Archivo Narrow\",sans-serif;display:grid;place-items:center;cursor:pointer}.ds-callout:hover{border-width:1.5px}.ds-callout:focus-visible{outline:1px solid #2F6BFF;outline-offset:2px}"
+    },
+    {
+      "name": "Verdict Actions",
+      "kind": "custom",
+      "description": "The handoff pair at the end of a loaded verdict: Repair plus Send, or one Send when watertight.",
+      "html": "<div class=\"ds-verdict-actions\"><button class=\"ds-btn-primary\">REPAIR…</button><button class=\"ds-btn-outline\">SEND TO BAMBU STUDIO</button></div>",
+      "css": ".ds-verdict-actions{display:flex;gap:8px;width:100%}.ds-verdict-actions>*{flex:1;min-width:0;height:36px;border-radius:0;font:600 12.5px/1 \"Archivo Narrow\",sans-serif;letter-spacing:.128em;text-transform:uppercase;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ds-verdict-actions .ds-btn-primary{background:#2F6BFF;color:#FFFFFF;border:1px solid #2F6BFF}.ds-verdict-actions .ds-btn-outline{background:#000000;color:#FFFFFF;border:1px solid #2F6BFF}.ds-verdict-actions button:focus-visible{outline:1px solid #2F6BFF;outline-offset:2px}"
+    },
+    {
+      "name": "Settings Sheet",
+      "kind": "custom",
+      "description": "Opaque black center plate for the persisted slicer choice, including a saved custom row and a MISSING state for a vanished path.",
+      "html": "<div class=\"ds-sheet ds-settings\"><div class=\"ds-kicker\">SETTINGS / SLICER</div><p>ModelView opens the current model in the slicer you choose. Files stay on this machine.</p><div class=\"ds-slicers\"><button class=\"ds-slicer is-selected\"><span class=\"ds-radio\"></span><b>Bambu Studio</b><small>/Applications/BambuStudio.app</small><em>FOUND</em></button></div><div class=\"ds-actions\"><button class=\"ds-btn-outline\">BROWSE…</button><button class=\"ds-btn-outline\">RESCAN</button></div><div class=\"ds-saved\">NO SLICER SELECTED</div><button class=\"ds-btn-primary\">CLOSE</button></div>",
+      "css": ".ds-sheet{width:540px;box-sizing:border-box;padding:28px;background:#000000;border:1px solid #263545;border-radius:0;color:#FFFFFF;font-family:\"Archivo Narrow\",sans-serif}.ds-kicker{font-size:9px;font-weight:600;letter-spacing:2.4px;text-transform:uppercase}.ds-sheet p{font-family:Archivo,sans-serif;font-size:14.5px;line-height:1.35;color:#A7B3BF;margin:8px 0 16px}.ds-slicers{display:grid;gap:8px}.ds-actions{display:flex;gap:8px;margin-top:16px}.ds-saved{font-size:10.5px;font-weight:600;letter-spacing:1.6px;margin:16px 0 4px;color:#FFFFFF;text-transform:uppercase}.ds-saved:after{content:\"Changes save when you close ModelView.\";display:block;font-size:10.5px;font-weight:400;letter-spacing:.5px;color:#A7B3BF;margin-top:4px}.ds-sheet>.ds-btn-primary{margin-top:12px}"
+    },
+    {
+      "name": "Slicer Row",
+      "kind": "custom",
+      "description": "A detected slicer as a square radio row; the selected row takes Blue Dim, an electric border and a filled radio.",
+      "html": "<button class=\"ds-slicer is-selected\"><span class=\"ds-radio\"></span><b>Bambu Studio</b><small>/Applications/BambuStudio.app</small><em>FOUND</em></button>",
+      "css": ".ds-slicer{display:grid;grid-template-columns:16px 1fr auto;grid-template-rows:auto auto;gap:2px 12px;align-items:center;width:100%;min-height:56px;padding:10px 12px;background:#000000;border:1px solid #161E28;border-radius:0;text-align:left;color:#FFFFFF;font-family:\"Archivo Narrow\",sans-serif;cursor:pointer}.ds-slicer .ds-radio{grid-row:1/3;width:16px;height:16px;border:1px solid #263545;background:#000000;position:relative}.ds-slicer b{font-size:15px;font-weight:500}.ds-slicer small{font-size:11px;color:#A7B3BF}.ds-slicer em{grid-row:1/3;font-style:normal;font-size:9.5px;font-weight:600;letter-spacing:1.3px;color:#A7B3BF}.ds-slicer.is-selected{background:#0A1730;border-color:#2F6BFF}.ds-slicer.is-selected .ds-radio{border-color:#2F6BFF;background:#2F6BFF;box-shadow:inset 0 0 0 4px #0A1730}.ds-slicer:focus-visible{outline:1px solid #2F6BFF;outline-offset:2px}"
+    },
+    {
+      "name": "Repair Sheet",
+      "kind": "custom",
+      "description": "Opaque black plate with before/after counts, safe-pass checkboxes and explicit Keep/Revert/Save/Send actions.",
+      "html": "<div class=\"ds-sheet ds-repair\"><div class=\"ds-kicker\">REPAIR / vase_broken.stl</div><div class=\"ds-metric\"><span>BEFORE</span><b>OPEN 24  WINDING 3  DEGENERATE 0  NON-MANIFOLD 0  SHELLS 1</b></div><div class=\"ds-metric is-clean\"><span>AFTER</span><b>OPEN 0  WINDING 0  DEGENERATE 0  NON-MANIFOLD 0  SHELLS 1</b></div><div class=\"ds-stats\">WELDED 103,487 / DEGENERATE 0 / DUPLICATES 0 / FLIPPED 1 / HOLES 1 / PATCHES 24</div><div class=\"ds-options\"><button class=\"ds-repair-option is-on\"><span></span><b>Weld coincident vertices</b><em>103,487</em></button><button class=\"ds-repair-option is-on\"><span></span><b>Fill boundary holes</b><em>1 LOOPS / 24 PATCHES</em></button></div><p class=\"ds-note\">Boundary holes are patched with a simple fan. Non-manifold edges stay unresolved; self-intersections are not checked.</p><div class=\"ds-actions\"><button class=\"ds-btn-primary\">KEEP REPAIRED</button><button class=\"ds-btn-outline\">REVERT</button></div><div class=\"ds-actions\"><button class=\"ds-btn-outline\">SAVE REPAIRED COPY…</button><button class=\"ds-btn-outline\">SET UP SLICER</button></div></div>",
+      "css": ".ds-repair .ds-metric{display:grid;gap:2px;margin-top:12px}.ds-repair .ds-metric span{font-size:9.5px;font-weight:600;letter-spacing:1.8px;color:#A7B3BF}.ds-repair .ds-metric b{font-size:12px;font-weight:500;color:#A7B3BF}.ds-repair .ds-metric.is-clean b{color:#FFFFFF}.ds-repair .ds-stats{font-size:10px;letter-spacing:.8px;color:#A7B3BF;margin-top:8px}.ds-repair .ds-options{display:grid;gap:0;margin:14px 0 10px}.ds-repair .ds-note{font-family:Archivo,sans-serif;font-size:10.5px;line-height:1.4;color:#A7B3BF;margin:0 0 16px}.ds-repair .ds-actions{display:flex;gap:8px;margin-top:8px}.ds-repair .ds-actions>*{height:36px;border-radius:0;font:600 12.5px/1 \"Archivo Narrow\",sans-serif;letter-spacing:.128em;text-transform:uppercase;cursor:pointer}"
+    },
+    {
+      "name": "Repair Option Row",
+      "kind": "custom",
+      "description": "A safe repair pass with a square checkbox and right-aligned count; disabled while the preview runs, and weld is locked on for STL.",
+      "html": "<button class=\"ds-repair-option is-on\"><span></span><b>Weld coincident vertices</b><em>103,487</em></button>",
+      "css": ".ds-repair-option{display:grid;grid-template-columns:16px 1fr auto;align-items:center;gap:12px;height:40px;width:100%;background:transparent;border:0;border-bottom:1px solid #161E28;border-radius:0;color:#FFFFFF;font-family:\"Archivo Narrow\",sans-serif;text-align:left;cursor:pointer}.ds-repair-option>span{width:16px;height:16px;border:1px solid #263545;background:#000000;position:relative}.ds-repair-option b{font-size:12.5px;font-weight:500}.ds-repair-option em{font-style:normal;font-size:11px;color:#A7B3BF}.ds-repair-option.is-on>span{border-color:#2F6BFF;background:#2F6BFF;box-shadow:inset 0 0 0 4px #000000}.ds-repair-option:focus-visible{outline:1px solid #2F6BFF;outline-offset:-1px}.ds-repair-option:disabled{color:#5C6B78}.ds-repair-option:disabled>span{border-color:#5C6B78}.ds-repair-option:disabled em{color:#5C6B78}"
+    },
+    {
+      "name": "Repaired Tag",
+      "kind": "chip",
+      "description": "Viewport state chip for a live preview or a kept repair; white, never electric blue.",
+      "html": "<span class=\"ds-chip ds-repaired\">REPAIRED PREVIEW</span>",
+      "css": ".ds-repaired{background:#000000;color:#FFFFFF;border:1px solid #263545;border-radius:0;height:26px;padding:0 9px;font:600 9px/1 \"Archivo Narrow\",sans-serif;letter-spacing:1.5px;text-transform:uppercase}"
+    },
+    {
+      "name": "Defect Theater",
+      "kind": "custom",
+      "description": "The focused defect mode: outward camera flight, a dark ghost specimen, one defect kind in ink, a White focus frame, and a live side report.",
+      "html": "<div class=\"ds-theater\"><span class=\"ds-chip\">THEATER</span><div class=\"ds-focus-frame\"><span class=\"ds-theater-marker\">1</span></div><div class=\"ds-theater-loupe\"><div>LOUPE / OPEN EDGE <b>× 24</b></div></div></div>",
+      "css": ".ds-theater{position:relative;min-height:300px;background:#000000;color:#FFFFFF;font-family:\"Archivo Narrow\",sans-serif;overflow:hidden}.ds-focus-frame{position:absolute;left:38%;top:38%;width:210px;height:120px;border:1px solid rgba(255,255,255,.62);box-shadow:none}.ds-theater-marker{position:absolute;left:50%;top:-14px;width:28px;height:28px;border-radius:50%;background:#000000;border:1px solid #FF5A5F;color:#FF5A5F;font-size:12px;line-height:26px;text-align:center}.ds-theater-loupe{position:absolute;right:20px;bottom:20px;width:220px;height:150px;background:#000000;border:1px solid #263545;padding:10px}.ds-theater-loupe div{font-size:8px;letter-spacing:1.5px}.ds-theater-loupe b{float:right;color:#FF5A5F}"
+    },
+    {
+      "name": "Topology Loupe",
+      "kind": "custom",
+      "description": "A black local-topology plate with valence endpoints, winding arrows, non-manifold knots and a White focus-frame leader.",
+      "html": "<div class=\"ds-loupe\"><header><span>LOUPE / OPEN EDGE</span><b>× 24</b></header><svg viewBox=\"0 0 236 110\" role=\"img\" aria-label=\"Local boundary loop\"><rect x=\"34\" y=\"20\" width=\"168\" height=\"72\" fill=\"none\" stroke=\"#FF5A5F\" stroke-width=\"1.5\"/><circle cx=\"34\" cy=\"20\" r=\"2.2\" fill=\"#FF5A5F\"/><circle cx=\"118\" cy=\"20\" r=\"2.2\" fill=\"#FF5A5F\"/><circle cx=\"202\" cy=\"20\" r=\"2.2\" fill=\"#FF5A5F\"/><circle cx=\"34\" cy=\"92\" r=\"2.2\" fill=\"#FF5A5F\"/><circle cx=\"118\" cy=\"92\" r=\"2.2\" fill=\"#FF5A5F\"/><circle cx=\"202\" cy=\"92\" r=\"2.2\" fill=\"#FF5A5F\"/><path d=\"M118 48v16M110 56h16\" stroke=\"#263545\"/></svg><footer><span>BOUNDARY · LOCAL 24 / 24</span><span>ESC EXIT · D NEXT</span></footer></div>",
+      "css": ".ds-loupe{width:260px;background:#000000;border:1px solid #263545;padding:12px;font-family:\"Archivo Narrow\",sans-serif;color:#FFFFFF}.ds-loupe header{display:flex;justify-content:space-between;font-size:8px;letter-spacing:1.5px;padding-bottom:6px;border-bottom:1px solid #161E28}.ds-loupe header b{color:#FF5A5F}.ds-loupe svg{display:block;width:100%;height:110px;margin:6px 0}.ds-loupe footer{display:flex;justify-content:space-between;gap:8px;font-size:7px;color:#A7B3BF;letter-spacing:.6px}.ds-loupe footer span:last-child{white-space:nowrap;text-align:right}"
+    },
+    {
+      "name": "Progressive Load",
+      "kind": "custom",
+      "description": "A live flat-shaded mesh on the first chunks of a large binary STL, with provisional counts and no waiting spinner.",
+      "html": "<div class=\"ds-live\"><span class=\"ds-chip\">STL</span><span class=\"ds-chip\">LARGE MODEL</span><span class=\"ds-chip ds-blue\">STREAMING</span><span class=\"ds-chip\">114,688 / 500,000 TRIANGLES</span></div>",
+      "css": ".ds-live{min-height:220px;background:#000000;padding:16px;display:flex;gap:8px;flex-wrap:wrap;align-content:flex-start;font-family:\"Archivo Narrow\",sans-serif}.ds-live .ds-chip{height:26px;display:inline-flex;align-items:center;padding:0 9px;border:1px solid #263545;color:#FFFFFF;font-size:9px;font-weight:600;letter-spacing:1.5px}.ds-live .ds-blue{border-color:#2F6BFF;color:#2F6BFF}"
+    },
+    {
+      "name": "Analysis Filmstrip",
+      "kind": "custom",
+      "description": "Six live check cells across the viewport bottom while a large STL streams; a blue scan line tracks the triangle fraction.",
+      "html": "<div class=\"ds-filmstrip\"><header><span>ANALYSIS FILMSTRIP / LIVE</span><span>114,688 / 500,000 TRIANGLES · 23%</span></header><div class=\"ds-cells\"><div><span>OPEN EDGE</span><b>204</b></div><div><span>NON-MANIF</span><b>0</b></div><div><span>WINDING</span><b>0</b></div><div><span>VOLUME</span><b>6.3 cm³</b></div><div><span>SHELLS</span><b>0</b></div><div><span>DEGEN</span><b>0</b></div></div></div>",
+      "css": ".ds-filmstrip{background:#000000;font-family:\"Archivo Narrow\",sans-serif;color:#FFFFFF;padding:8px 12px;border:1px solid #263545}.ds-filmstrip header{display:flex;justify-content:space-between;font-size:8px;letter-spacing:1.4px;color:#A7B3BF;margin-bottom:5px}.ds-cells{display:grid;grid-template-columns:repeat(6,1fr);border-top:1px solid #161E28}.ds-cells div{padding:6px 8px;border-right:1px solid #161E28}.ds-cells div:last-child{border-right:0}.ds-cells span{display:block;font-size:7px;letter-spacing:1px;color:#A7B3BF}.ds-cells b{display:block;margin-top:4px;font-size:11px;font-weight:600;color:#FFFFFF}"
+    },
+    {
+      "name": "Orientation Adviser",
+      "kind": "custom",
+      "description": "The sixth side section and the candidate pose rows on an assumed 256³ bed; preview only.",
+      "html": "<div class=\"ds-orient\"><div class=\"ds-kicker\">06 / ORIENTATION</div><p>Test candidate poses on a 256 × 256 × 256 mm bed. Preview only.</p><strong>FITS BED</strong><button class=\"ds-orient-row is-selected\"><span>RECOMMENDED / LOWEST PROFILE</span><small>H 34.0 MM / 82 × 99 FOOT</small><em>FITS</em></button><button class=\"ds-orient-row\"><span>FEWEST OVERHANGS</span><small>H 94.7 MM / 83 × 54 FOOT</small><em>FITS</em></button></div>",
+      "css": ".ds-orient{background:#000000;color:#FFFFFF;font-family:\"Archivo Narrow\",sans-serif;padding:12px;border-left:1px solid #161E28}.ds-orient p{font-family:Archivo,sans-serif;font-size:10.5px;line-height:1.4;color:#A7B3BF;margin:8px 0}.ds-orient strong{font-size:11px;letter-spacing:1.5px}.ds-orient-row{display:grid;grid-template-columns:1fr auto;gap:2px 10px;width:100%;min-height:58px;padding:8px;background:#000000;border:1px solid #161E28;border-radius:0;text-align:left;color:#FFFFFF;font-family:\"Archivo Narrow\",sans-serif;margin-top:8px}.ds-orient-row span{font-size:10.5px;font-weight:600}.ds-orient-row small{grid-column:1;font-size:8.5px;color:#A7B3BF}.ds-orient-row em{grid-row:1/3;font-style:normal;font-size:8px;font-weight:600;letter-spacing:1px}.ds-orient-row.is-selected{background:#0A1730;border-color:#2F6BFF}"
+    },
+    {
+      "name": "Bed Grid",
+      "kind": "custom",
+      "description": "A dim 256 × 256 GPU floor grid at z=0 with blue axes; the specimen sits on it during orientation.",
+      "html": "<div class=\"ds-bed\"><span>BED 256 × 256 MM / ASSUMED</span></div>",
+      "css": ".ds-bed{min-height:180px;background:#000000;border:1px solid #161E28;position:relative}.ds-bed:before{content:\"\";position:absolute;inset:22px;background:repeating-linear-gradient(0deg,transparent 0 31px,#101a24 31px 32px),repeating-linear-gradient(90deg,transparent 0 31px,#101a24 31px 32px);border:1px solid #263545}.ds-bed span{position:absolute;left:12px;bottom:12px;font:600 8px \"Archivo Narrow\",sans-serif;letter-spacing:1.4px;color:#A7B3BF}"
+    },
+    {
+      "name": "Recovery Offer",
+      "kind": "custom",
+      "description": "An amber recoverable-3MF failure with FIX ON LOAD, followed by a RECOVERED scene that preserves plates and names.",
+      "html": "<div class=\"ds-recovery\"><div class=\"ds-kicker\">PACKAGE NEEDS RECOVERY</div><p>This 3MF keeps its objects in external model parts. Fix on load to resolve them, preserve every plate, and open the model.</p><div><button class=\"ds-btn-primary\">FIX ON LOAD</button><button class=\"ds-btn-outline\">OPEN ANOTHER</button></div><em>RECOVERED · 80 OBJ / 8 PLATES</em></div>",
+      "css": ".ds-recovery{background:#000000;color:#FFFFFF;font-family:\"Archivo Narrow\",sans-serif;padding:24px;border:1px solid #263545}.ds-recovery .ds-kicker{font-size:9px;font-weight:600;letter-spacing:2.2px;color:#F5A524;text-transform:uppercase}.ds-recovery p{font-family:Archivo,sans-serif;font-size:14.5px;line-height:1.35;color:#FFFFFF;max-width:520px}.ds-recovery div{display:flex;gap:8px}.ds-recovery button{height:40px;border-radius:0;font:600 12.5px/1 \"Archivo Narrow\",sans-serif;letter-spacing:.14em;text-transform:uppercase}.ds-recovery em{display:block;margin-top:12px;font-style:normal;font-size:9px;font-weight:600;letter-spacing:1.5px;color:#FFFFFF}"
+    },
+    {
+      "name": "Part Color Swatch",
+      "kind": "custom",
+      "description": "A 10px source-color square in the object row; defined 3MF part colors also drive the viewport tint with a visibility lift.",
+      "html": "<div class=\"ds-part-row\"><span class=\"ds-swatch\" style=\"background:#5E6344\"></span><span><b>Army Dark Green 1.stl_1</b><small>1,431,460 TRIANGLES</small></span><em>CLOSED</em></div>",
+      "css": ".ds-part-row{display:grid;grid-template-columns:10px 1fr auto;gap:10px;align-items:center;height:54px;border-bottom:1px solid #161E28;font-family:\"Archivo Narrow\",sans-serif;color:#FFFFFF;padding:0 8px}.ds-swatch{width:10px;height:10px;border:1px solid #263545}.ds-part-row b{display:block;font-size:12px;font-weight:500}.ds-part-row small{display:block;font-size:8px;letter-spacing:1px;color:#A7B3BF}.ds-part-row em{font-style:normal;font-size:8.5px;font-weight:600;letter-spacing:1.2px;color:#A7B3BF}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Blueprint Plate",
+    "overview": "ModelView is a working inspection plate drawn in pure black and white, with one electric blue line for interaction and four defect inks for truth. The mesh is the specimen; the calibrated index rail holds the verdict, checks, measurements and objects; a defect never borrows the blue, so the accent can never be confused with a failure. The interface answers one question — is this printable? — in a single 44px reading before the eye reaches the detail.\n\nThe surface is black at every layer: viewport, top strip, rail, inspector and status bar are all #000000. Separation is earned by 1px #161E28 hairlines and #263545 interactive borders, never by tonal panel fills. The one blue (#2F6BFF) marks buttons, borders, focus, active segments, the selected-object rule and the hidden-inspector hint; it is the live line. Red #FF5A5F, amber #F5A524, teal #14B8A6 and violet #A78BFA mean open edge, non-manifold, flipped winding and degenerate — on the mesh, in the legend, and in the callouts.\n\nThe type ramp is deliberately larger than the first release for high-resolution displays: 76px wordmark, 44px verdict, 18px data, 15px row labels, 12.5px explanations, 11.5px metas, 10px rail labels. Density stays high because the content is dense; legibility comes first. The earlier charcoal/bone/sodium surface was retired at the user's request; the rail, callout and timing structures survive. Two opaque Blueprint sheets — Settings and Repair — extend the same plate: square radios and checkboxes, a filled Keep action (Send also fills when a slicer is configured), and a `REPAIRED PREVIEW` chip that becomes `REPAIRED` only after an explicit Keep.",
+    "keyCharacteristics": [
+      "Pure #000000 field everywhere, with no tonal panel fills.",
+      "White primary text, blue-gray secondary; graphite-faint is decoration only.",
+      "One electric blue for interactive borders, buttons, focus and selection.",
+      "Four defect inks with fixed meanings, and darker line variants for the lit mesh.",
+      "Square hairlines, 0px corners, no shadows; the GPU mesh supplies the depth.",
+      "Condensed, tracked Archivo Narrow; a 44px verdict as the one display moment.",
+      "Real parse and check timings; no idle FPS.",
+      "Settings and Repair sheets are opaque black plates, not cards.",
+      "Repair is explicit: REPAIRED PREVIEW while previewing, REPAIRED after Keep; the source file is never overwritten.",
+      "Defect Theater is the one performance mode: one defect kind at a time, a ghost specimen, and a topology loupe.",
+      "No-wait large binary STL: a live flat mesh and six-cell analysis filmstrip appear before the authoritative report.",
+      "Orientation Adviser previews poses on an assumed 256³ bed; the source file and side report are never rewritten.",
+      "Large 3MFs that keep geometry in external parts offer FIX ON LOAD; recovery keeps plates/names and never rewrites the source.",
+      "Defined 3MF part colors replace the cool Clay palette; dark print colors are lifted for the black plate and swatched in object rows."
+    ],
+    "rules": [
+      {
+        "name": "The One Blue Rule",
+        "body": "#2F6BFF marks interactive state only: primary buttons, interactive borders, focus, active segments, selection. It is never a background, a heading color, or a defect ink.",
+        "section": "colors"
+      },
+      {
+        "name": "The Defect Ink Rule",
+        "body": "Red, amber, teal and violet mean open edge, non-manifold, winding and degenerate — in that binding, on the mesh and in the legend. They never decorate UI.",
+        "section": "colors"
+      },
+      {
+        "name": "The Pure Black Rule",
+        "body": "Every surface is #000000. Separation comes from a 1px hairline, never from a lighter panel fill.",
+        "section": "colors"
+      },
+      {
+        "name": "The Quiet Chrome Rule",
+        "body": "Content text is Graphite or White. Graphite Faint is reserved for ticks, disabled states and placeholder marks.",
+        "section": "colors"
+      },
+      {
+        "name": "The Small Type Rule",
+        "body": "In the loaded report, the smallest content is 10px (rail labels); explanations are 12.5px, metas 11.5px, row labels 15px, data 18px. Display type is the 44px verdict and the 76px wordmark; nothing else exceeds 18px.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tracked Caps Rule",
+        "body": "Labels are uppercase, tracked 0.1–0.19em; body prose is never uppercase.",
+        "section": "typography"
+      },
+      {
+        "name": "The Fixed Chrome Rule",
+        "body": "The rail and inspector keep their widths. Only the viewport grows.",
+        "section": "layout"
+      },
+      {
+        "name": "The One Fold Rule",
+        "body": "The verdict, checks, and the first object/model group fit as far as the height allows; the rest scrolls behind a quiet blue-gray scrollbar.",
+        "section": "layout"
+      },
+      {
+        "name": "The Flat Plate Rule",
+        "body": "No box shadows, blur, glass or glow. A surface earns separation with a 1px line or a blue border.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Square Specimen Rule",
+        "body": "If a corner is visible, it is 0px. The one round content form is the defect callout; the settings gear is the only other circular glyph.",
+        "section": "shapes"
+      },
+      {
+        "name": "The Explicit Repair Rule",
+        "body": "Repair is previewed on the real scene; Keep is the only way to mark REPAIRED, and the source file is never overwritten. A no-op preview says so and cannot be kept.",
+        "section": "shapes"
+      },
+      {
+        "name": "The Safe Claim Rule",
+        "body": "The repair reports only the five safe passes. Non-manifold edges remain reported and self-intersections are not checked; the interface never implies otherwise.",
+        "section": "colors"
+      },
+      {
+        "name": "The Sheet Focus Rule",
+        "body": "Settings and Help dim the frame behind them; Repair dims the topbar, rail and inspector but keeps the live preview and status readout lit. The dim is a flat black scrim, never a shadow, blur or glass. When a centered sheet would clip the fixed topbar, status bar or inspector, that chrome yields to a blank field for the sheet’s lifetime; panel widths, the rail and the live preview stay put.",
+        "section": "shapes"
+      },
+      {
+        "name": "The One Story Rule",
+        "body": "Theater holds one defect kind and one marker at a time. The focused kind keeps its ink at full strength; everything else becomes the ghost. Competing colored stories are forbidden.",
+        "section": "colors"
+      },
+      {
+        "name": "The Frame Is UI Rule",
+        "body": "The focus frame is 1px White with corner ticks; defect ink belongs to the geometry, and Electric Blue belongs to the interactive marker. Never paint a colored disc or halo around the focus.",
+        "section": "shapes"
+      },
+      {
+        "name": "The No Aura Rule",
+        "body": "No bloom, glow, translucent disc, gradient or looping pulse. The ghost, the White frame, the ink lines and the topology loupe carry the moment.",
+        "section": "colors"
+      },
+      {
+        "name": "The No-Wait Rule",
+        "body": "A large binary STL must put geometry on screen before analysis finishes. The stream is flat and provisional; the analysis filmstrip and counts settle as the authoritative report lands. Never replace it with an indeterminate spinner.",
+        "section": "shapes"
+      },
+      {
+        "name": "The Assumed Bed Rule",
+        "body": "Orientation is a 256 × 256 × 256 mm preview. The bed assumption is stated in the section and at the bed edge. The source file, source orientation and side report are never rewritten.",
+        "section": "shapes"
+      },
+      {
+        "name": "The Recovered-Not-Rewritten Rule",
+        "body": "Recovery resolves external parts in memory, keeps plates and names, and skips broken parts. It never writes the source and never claims the mesh is watertight; Send exports a temporary recovered copy.",
+        "section": "shapes"
+      },
+      {
+        "name": "The Defined Part Color Rule",
+        "body": "A 3MF's own part colors replace the cool palette. Dark print colors are lifted 32% toward white for the black plate; the object-row swatch shows the source color; undefined parts keep the Clay order. Color is per object, never invented per face. A warm part color is user content, not a sodium accent.",
+        "section": "colors"
+      }
+    ],
+    "dos": [
+      "Do keep every background at #000000; use 1px hairlines and blue borders for separation.",
+      "Do keep Electric Blue for interactive state only: buttons, borders, focus, active segments and selection.",
+      "Do keep the defect inks semantic on the mesh, in the legend and in the callouts; use the darker line variants on the lit mesh.",
+      "Do keep content text at Graphite or brighter; Graphite Faint is decoration only.",
+      "Do keep the larger ramp: 10px minimum for rail labels, 12.5px explanations, 15px rows, 18px data, 44px verdict.",
+      "Do keep 0px corners, 1px rules and no shadows.",
+      "Do follow BambuStudio for the viewport's hands and the Ctrl/Cmd+1–7 view presets.",
+      "Do show real parse and check timings; label synthetic samples and the STL millimetre assumption.",
+      "Do use opaque black sheets with a 1px Hairline Bright border and 0px corners; they are plates, not cards.",
+      "Do mark REPAIRED PREVIEW while previewing and REPAIRED only after Keep; disable Keep when no safe pass changed geometry.",
+      "Do state what repair did not heal; non-manifold edges are reported, never claimed fixed.",
+      "Do ghost the specimen, not the defect; keep the focused kind in its ink and the rest of the field quiet.",
+      "Do use the White focus frame and the Blue selected-marker ring; no colored disc, halo or bloom.",
+      "Do keep the side report live in theater and return the camera on Esc.",
+      "Do stream large binary STL as a live flat mesh and let the six-cell filmstrip carry the analysis progress.",
+      "Do frame orientation as a preview on an assumed 256³ bed; rotate the specimen, never the source.",
+      "Do offer FIX ON LOAD when a large 3MF fails on external object parts, and keep every plate and object name after recovery.",
+      "Do use defined 3MF part colors in the viewport and object-row swatches; lift dark print colors for the black plate."
+    ],
+    "donts": [
+      "Don't add eyebrow or kicker labels above headings; section locators live in the rail and the section heads.",
+      "Don't use a tonal panel fill to separate chrome from the viewport.",
+      "Don't use Electric Blue as a defect ink or as a decorative accent on data.",
+      "Don't use Graphite Faint for body, explanations, metas or state values.",
+      "Don't introduce cards, shadows, glass, gradients, pills or rounded corners.",
+      "Don't show idle FPS or invented performance numbers.",
+      "Don't use warm clay or sodium/warm-yellow accents; the surface is black, white and cool blue.",
+      "Don't put a second status stack beside the calibrated rail.",
+      "Don't claim non-manifold healing or self-intersection detection; neither is in the safe repair.",
+      "Don't overwrite the source file when saving or sending a repair.",
+      "Don't mark a scene repaired when the preview is unchanged.",
+      "Don't add particles, bloom, glow, chromatic aberration or idle loops to theater.",
+      "Don't let two defect kinds compete for the theater's ink at full strength.",
+      "Don't show a spinner for a large model when a streamed mesh can be visible.",
+      "Don't imply the orientation adviser changed the file or found a new defect fact.",
+      "Don't imply package recovery repaired the mesh; the checks and Repair flow still own that.",
+      "Don't invent per-face colors or override a defined part color with the Clay palette."
+    ]
+  }
+}

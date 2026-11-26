@@ -1,0 +1,18 @@
+/target
+.DS_Store
+*.log
+
+# Design review captures and downloaded reference boards are working material.
+.impeccable/review/
+.impeccable/reference/
+
+# Local-only large test model.
+/*.3mf
+
+# Internal execution plans and ledgers are intentionally not published.
+/docs/superpowers/plans/
+/.superpowers/
+
+# Python bytecode.
+__pycache__/
+*.pyc
