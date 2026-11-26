@@ -38,7 +38,7 @@ No cloud. No account. No telemetry. Your questionable Benchy stays on your disk.
 - **Orientation Adviser.** Ranks candidate poses on an assumed 256 mm bed by height, support risk and bed contact, then rotates the specimen into place. Preview only; the slicer still owns the final pose.
 - **Part colors.** If the 3MF already defines them, the viewport and object-row swatches use them. Undefined parts keep the cool specimen palette.
 
-## A quick look
+## Screenshots
 
 <div align="center">
 
@@ -52,7 +52,14 @@ No cloud. No account. No telemetry. Your questionable Benchy stays on your disk.
 
 <sub><strong>Left:</strong> the Orientation Adviser has a 256 mm bed and a plan; your printer may have notes. <strong>Right:</strong> 500,000 triangles streaming in while the analysis filmstrip counts.</sub>
 
+<img src="docs/modelview-repair.png" alt="Repair preview sheet" width="49%" />
+<img src="docs/modelview-1024.png" alt="ModelViewer at 1024 by 700" width="49%" />
+
+<sub><strong>Left:</strong> safe repair, five calm passes, and an original file that survives the meeting. <strong>Right:</strong> the same report at 1024×700, with shorter legend labels and no tiny-type apology.</sub>
+
 </div>
+
+<sub>All captures are release screenshots at 1440×900 except the explicit 1024×700 layout check. Each PNG has a `<name>.png.json` provenance sidecar.</sub>
 
 ## Quick start
 
