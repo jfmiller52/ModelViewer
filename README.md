@@ -6,6 +6,7 @@
 
 [![License: MIT](https://img.shields.io/github/license/jfmiller52/ModelViewer?style=for-the-badge)](https://github.com/jfmiller52/ModelViewer/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/jfmiller52/ModelViewer?style=for-the-badge)](https://github.com/jfmiller52/ModelViewer/stargazers)
+[![Release](https://img.shields.io/github/v/release/jfmiller52/ModelViewer?style=for-the-badge&label=release)](https://github.com/jfmiller52/ModelViewer/releases/latest)
 [![Rust](https://img.shields.io/badge/Rust-000000?style=for-the-badge&logo=rust&logoColor=white)](https://www.rust-lang.org/)
 [![egui + wgpu](https://img.shields.io/badge/UI-egui%20%2B%20wgpu-2F6BFF?style=for-the-badge)](https://github.com/emilk/egui)
 ![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows-000000?style=for-the-badge)
@@ -74,6 +75,8 @@ Then drag an STL/3MF onto the window, press **Open file**, or pass a path direct
 ```sh
 cargo run --release -- samples/vase_broken.stl
 ```
+
+Prebuilt **macOS (Apple Silicon)** builds are on the [Releases](https://github.com/jfmiller52/ModelViewer/releases) page; they are ad-hoc signed, not notarized. Windows and Linux build from source.
 
 Requirements: Rust 1.95 or newer and a GPU with Metal (macOS), DirectX 12 or Vulkan (Windows), or Vulkan (Linux). No webview, no Electron, no runtime services.
 
