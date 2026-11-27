@@ -1355,13 +1355,16 @@ impl ModelView {
             },
             CheckRow {
                 label: "Manifold joins",
-                detail: "No edge shared by three or more faces",
-                value: if s.non_manifold_edges == 0 {
+                detail: "No edge shared by three or more faces, no split vertex fan",
+                value: if s.non_manifold_edges + s.non_manifold_vertices == 0 {
                     "Clean".into()
                 } else {
-                    format!("{} edges", theme::fmt_int(s.non_manifold_edges))
+                    format!(
+                        "{} joins",
+                        theme::fmt_int(s.non_manifold_edges + s.non_manifold_vertices)
+                    )
                 },
-                state: if s.non_manifold_edges == 0 {
+                state: if s.non_manifold_edges + s.non_manifold_vertices == 0 {
                     theme::StateMark::Pass
                 } else {
                     theme::StateMark::Fail
@@ -1857,6 +1860,7 @@ impl ModelView {
             original_summary: self.summary.clone(),
             original_markers: self.markers.clone(),
             options: RepairOptions::default(),
+            deep_repair: false,
             revision: 1,
             saved_path: None,
             saved_revision: None,
@@ -1868,6 +1872,7 @@ impl ModelView {
         self.repair_job = Some(repair_flow::start_repair(
             session.original.clone(),
             session.options,
+            session.deep_repair,
             ctx.clone(),
         ));
         self.repair = Some(session);
@@ -2027,6 +2032,7 @@ impl ModelView {
         if weld_locked {
             options.weld = true;
         }
+        let mut deep_repair = session.deep_repair;
         let mut changed = false;
         let mut action: Option<RepairAction> = None;
         let mut open = true;
@@ -2036,7 +2042,19 @@ impl ModelView {
         let flipped: usize = stats.iter().map(|s| s.faces_flipped).sum();
         let holes: usize = stats.iter().map(|s| s.holes_filled).sum();
         let patches: usize = stats.iter().map(|s| s.patch_faces).sum();
-        let no_change = welded + degenerate + duplicates + flipped + holes == 0;
+        let healed_edges: usize = stats.iter().map(|s| s.non_manifold_edges_healed).sum();
+        let healed_vertices: usize = stats.iter().map(|s| s.non_manifold_vertices_healed).sum();
+        let rolled_back: usize = stats.iter().map(|s| s.passes_rolled_back).sum();
+        let deep_remeshed = stats.iter().any(|s| s.deep_remeshed);
+        let voxel_size = stats
+            .iter()
+            .find(|s| s.deep_remeshed)
+            .map(|s| s.voxel_size_mm)
+            .unwrap_or(0.0);
+        let no_change = !deep_remeshed
+            && welded + degenerate + duplicates + flipped + holes + healed_edges + healed_vertices
+                == 0;
+        let compact = ctx.content_rect().height() < 760.0;
 
         egui::Window::new("Repair")
             .id(Id::unique("repair_window"))
@@ -2080,22 +2098,55 @@ impl ModelView {
                         );
                     }
                     ui.add_space(4.0);
-                    theme::label(
-                        ui,
-                        format!(
-                            "WELDED {} / DEGENERATE {} / DUPLICATES {} / FLIPPED {} / HOLES {} / PATCHES {}",
-                            theme::fmt_int(welded),
-                            theme::fmt_int(degenerate),
-                            theme::fmt_int(duplicates),
-                            theme::fmt_int(flipped),
-                            theme::fmt_int(holes),
-                            theme::fmt_int(patches)
-                        ),
-                        10.0,
-                        theme::narrow(),
-                        theme::DIM,
-                        0.8,
-                    );
+                    if deep_remeshed {
+                        theme::label(
+                            ui,
+                            format!(
+                                "DEEP REMESH / ~{:.2} MM / SDF REBUILD",
+                                voxel_size
+                            ),
+                            10.0,
+                            theme::narrow(),
+                            theme::BONE,
+                            0.8,
+                        );
+                    } else {
+                        theme::label(
+                            ui,
+                            format!(
+                                "WELDED {} / DEGENERATE {} / DUPLICATES {} / FLIPPED {} / HOLES {} / PATCHES {}",
+                                theme::fmt_int(welded),
+                                theme::fmt_int(degenerate),
+                                theme::fmt_int(duplicates),
+                                theme::fmt_int(flipped),
+                                theme::fmt_int(holes),
+                                theme::fmt_int(patches)
+                            ),
+                            10.0,
+                            theme::narrow(),
+                            theme::DIM,
+                            0.8,
+                        );
+                        if healed_edges + healed_vertices + rolled_back > 0 {
+                            theme::label(
+                                ui,
+                                format!(
+                                    "JOINS {} EDGES / {} VERTICES{}",
+                                    theme::fmt_int(healed_edges),
+                                    theme::fmt_int(healed_vertices),
+                                    if rolled_back > 0 {
+                                        format!(" / {} PASSES DECLINED", theme::fmt_int(rolled_back))
+                                    } else {
+                                        String::new()
+                                    }
+                                ),
+                                10.0,
+                                theme::narrow(),
+                                theme::DIM,
+                                0.8,
+                            );
+                        }
+                    }
                     if let Some(saved) = &saved_path {
                         ui.add_space(4.0);
                         theme::label(
@@ -2119,8 +2170,9 @@ impl ModelView {
                     ui.add_space(6.0);
                     theme::label(ui, notice, 9.5, theme::narrow(), theme::BONE, 0.5);
                 }
-                ui.add_space(14.0);
+                ui.add_space(if compact { 8.0 } else { 14.0 });
                 let disabled = job_running;
+                let safe_disabled = disabled || deep_repair;
                 if repair_option_row(
                     ui,
                     if weld_locked {
@@ -2129,27 +2181,67 @@ impl ModelView {
                         "Weld coincident vertices"
                     },
                     &mut options.weld,
-                    disabled,
+                    safe_disabled,
                     weld_locked,
                     theme::fmt_int(welded),
                 ) {
                     changed = true;
                 }
-                if repair_option_row(ui, "Remove degenerate faces", &mut options.remove_degenerate, disabled, false, theme::fmt_int(degenerate)) { changed = true; }
-                if repair_option_row(ui, "Remove duplicate faces", &mut options.remove_duplicate_faces, disabled, false, theme::fmt_int(duplicates)) { changed = true; }
-                if repair_option_row(ui, "Fix winding", &mut options.fix_winding, disabled, false, theme::fmt_int(flipped)) { changed = true; }
-                let loop_word = if holes == 1 { "LOOP" } else { "LOOPS" };
-                if repair_option_row(ui, "Fill boundary holes", &mut options.fill_holes, disabled, false, format!("{holes} {loop_word} / {patches} PATCHES")) { changed = true; }
-                ui.add_space(10.0);
-                theme::label(
+                if repair_option_row(ui, "Remove degenerate faces", &mut options.remove_degenerate, safe_disabled, false, theme::fmt_int(degenerate)) { changed = true; }
+                if repair_option_row(ui, "Remove duplicate faces", &mut options.remove_duplicate_faces, safe_disabled, false, theme::fmt_int(duplicates)) { changed = true; }
+                if repair_option_row(
                     ui,
-                    "Boundary holes are patched with a simple fan. Non-manifold edges stay unresolved; self-intersections are not checked.",
-                    10.0,
-                    theme::narrow(),
-                    theme::DIM,
-                    0.4,
-                );
-                ui.add_space(16.0);
+                    "Split non-manifold joins",
+                    &mut options.heal_non_manifold,
+                    safe_disabled,
+                    false,
+                    format!(
+                        "{} EDGES / {} VERTICES",
+                        theme::fmt_int(healed_edges),
+                        theme::fmt_int(healed_vertices)
+                    ),
+                ) {
+                    changed = true;
+                }
+                if repair_option_row(ui, "Fix winding", &mut options.fix_winding, safe_disabled, false, theme::fmt_int(flipped)) { changed = true; }
+                let loop_word = if holes == 1 { "LOOP" } else { "LOOPS" };
+                if repair_option_row(ui, "Fill boundary holes", &mut options.fill_holes, safe_disabled, false, format!("{holes} {loop_word} / {patches} PATCHES")) { changed = true; }
+                let deep_detail = if voxel_size > 0.0 {
+                    format!("~{:.2} MM", voxel_size)
+                } else {
+                    "AUTO".to_string()
+                };
+                if repair_option_row(
+                    ui,
+                    "Deep remesh (rebuild geometry)",
+                    &mut deep_repair,
+                    disabled,
+                    false,
+                    deep_detail,
+                ) {
+                    changed = true;
+                }
+                ui.add_space(if compact { 6.0 } else { 10.0 });
+                if deep_repair {
+                    theme::label(
+                        ui,
+                        "Deep remesh rebuilds the whole object on a signed distance grid. Sharp detail and thin features may change; only a watertight result is kept. The source is never overwritten.",
+                        10.0,
+                        theme::narrow(),
+                        theme::DIM,
+                        0.4,
+                    );
+                } else {
+                    theme::label(
+                        ui,
+                        "Boundary holes are patched with a simple fan. Non-manifold joins are split only when the AFTER report improves; remaining joins stay unresolved. Self-intersections are not checked.",
+                        10.0,
+                        theme::narrow(),
+                        theme::DIM,
+                        0.4,
+                    );
+                }
+                ui.add_space(if compact { 10.0 } else { 16.0 });
                 let keep_enabled = !job_running && after.is_some() && !no_change;
                 let io_enabled = !job_running && after.is_some();
                 ui.horizontal(|ui| {
@@ -2187,12 +2279,14 @@ impl ModelView {
         }
         if changed && !job_running {
             session.options = options;
+            session.deep_repair = deep_repair;
             session.revision += 1;
             session.saved_path = None;
             session.saved_revision = None;
             self.repair_job = Some(repair_flow::start_repair(
                 session.original.clone(),
                 options,
+                deep_repair,
                 ctx.clone(),
             ));
             self.repair_error = None;
@@ -3643,7 +3737,12 @@ impl ModelView {
             let defects = self
                 .reports
                 .get(index)
-                .map(|r| r.open_edges + r.non_manifold_edges + r.inconsistent_edges)
+                .map(|r| {
+                    r.open_edges
+                        + r.non_manifold_edges
+                        + r.non_manifold_vertices
+                        + r.inconsistent_edges
+                })
                 .unwrap_or(0);
             if defects > 0 {
                 ptext(
@@ -4503,6 +4602,7 @@ impl ModelView {
         let y = rect.top() + 24.0;
         let total_defects = self.summary.open_edges
             + self.summary.non_manifold_edges
+            + self.summary.non_manifold_vertices
             + self.summary.inconsistent_edges
             + self.summary.degenerate_triangles;
         let mut tags: Vec<(String, Color32)> =
@@ -4659,7 +4759,10 @@ impl ModelView {
         } else {
             let counts = [
                 (DefectKind::OpenEdge, self.summary.open_edges),
-                (DefectKind::NonManifold, self.summary.non_manifold_edges),
+                (
+                    DefectKind::NonManifold,
+                    self.summary.non_manifold_edges + self.summary.non_manifold_vertices,
+                ),
                 (
                     DefectKind::InconsistentWinding,
                     self.summary.inconsistent_edges,
@@ -5984,7 +6087,9 @@ fn repair_option_row(
     } else {
         Sense::hover()
     };
-    let (rect, response) = ui.allocate_exact_size(Vec2::new(width, 40.0), sense);
+    let compact = ui.ctx().content_rect().height() < 760.0;
+    let height = if compact { 34.0 } else { 40.0 };
+    let (rect, response) = ui.allocate_exact_size(Vec2::new(width, height), sense);
     let painter = ui.painter();
     if interactive && response.hovered() {
         painter.rect_filled(
@@ -6007,11 +6112,24 @@ fn repair_option_row(
     painter.rect_stroke(
         square,
         egui::CornerRadius::ZERO,
-        Stroke::new(1.0, if *value { theme::BLUE } else { theme::LINE2 }),
+        Stroke::new(
+            1.0,
+            if disabled {
+                theme::FAINT
+            } else if *value {
+                theme::BLUE
+            } else {
+                theme::LINE2
+            },
+        ),
         StrokeKind::Inside,
     );
     if *value {
-        painter.rect_filled(square.shrink(4.0), egui::CornerRadius::ZERO, theme::BLUE);
+        painter.rect_filled(
+            square.shrink(4.0),
+            egui::CornerRadius::ZERO,
+            if disabled { theme::FAINT } else { theme::BLUE },
+        );
     }
     ptext(
         painter,
@@ -6062,7 +6180,7 @@ fn repair_metrics(ui: &mut Ui, label: &str, summary: &MeshReport, color: Color32
         theme::fmt_int(summary.open_edges),
         theme::fmt_int(summary.inconsistent_edges),
         theme::fmt_int(summary.degenerate_triangles),
-        theme::fmt_int(summary.non_manifold_edges),
+        theme::fmt_int(summary.non_manifold_edges + summary.non_manifold_vertices),
         theme::fmt_int(summary.shells),
     );
     ptext(

@@ -7,6 +7,7 @@ license.workspace = true
 
 [dependencies]
 anyhow.workspace = true
+baby_shark.workspace = true
 glam.workspace = true
 rayon.workspace = true
 roxmltree.workspace = true

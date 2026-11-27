@@ -30,9 +30,10 @@ No cloud. No account. No telemetry. Your questionable Benchy stays on your disk.
 ## The useful bits
 
 - **STL and 3MF, interpreted properly.** Binary/ASCII STL, 3MF units, components, build transforms, plates, Bambu project metadata, and part colors.
-- **Real topology checks.** Open edges, non-manifold edges, winding, signed volume, shells, and degenerate faces, with numbered defect markers and filters.
+- **Real topology checks.** Open edges, non-manifold edges and split vertex fans, winding, signed volume, shells, and degenerate faces, with numbered defect markers and filters.
 - **Defect Theater.** Click a callout or press `D`: the camera flies to the defect, the model goes ghost, a White focus frame holds the area, and a topology loupe reads local valence and winding. No RGB, no bloom; this is a workshop.
-- **Safe repair with receipts.** Preview five boring, useful passes, compare the AFTER report, then Keep, Revert, save a repaired STL/3MF, or send it. The source file is never overwritten.
+- **Safe repair with receipts.** Preview six boring, useful passes, compare the AFTER report, then Keep, Revert, save a repaired STL/3MF, or send it. Every pass is checked against the real report and rolled back if it does not improve the model. The source file is never overwritten.
+- **Deep repair when topology is beyond saving.** Opt into an SDF rebuild on a ~1 mm grid, then let the safe cleanup check the result. Sharp detail may change; only a watertight rebuild is offered. It stays a preview until you Keep.
 - **Slicer handoff.** Detects Bambu Studio, OrcaSlicer, PrusaSlicer, UltiMaker Cura, or a custom app/executable, remembers the choice, and opens the current file. It does not install the slicer for you.
 - **Large binary STL without the spinner.** The first triangle chunks appear as a live flat mesh while a six-cell analysis filmstrip counts the checks. The smooth authoritative scene replaces it at the handoff.
 - **Large 3MF recovery.** Bambu packages with external `p:path` object parts offer **FIX ON LOAD**; the package is flattened in memory, plates and names survive, and broken parts are skipped and counted. The source is not modified.
@@ -56,7 +57,7 @@ No cloud. No account. No telemetry. Your questionable Benchy stays on your disk.
 <img src="docs/modelview-repair.png" alt="Repair preview sheet" width="49%" />
 <img src="docs/modelview-1024.png" alt="ModelViewer at 1024 by 700" width="49%" />
 
-<sub><strong>Left:</strong> safe repair, five calm passes, and an original file that survives the meeting. <strong>Right:</strong> the same report at 1024×700, with shorter legend labels and no tiny-type apology.</sub>
+<sub><strong>Left:</strong> six safe passes, an opt-in SDF rebuild, and an original file that survives the meeting. <strong>Right:</strong> the same report at 1024×700, with shorter legend labels and no tiny-type apology.</sub>
 
 </div>
 
@@ -87,7 +88,7 @@ macOS is the environment exercised most in this repository. Windows is a primary
 | Check | A failure means |
 |---|---|
 | **Closed surface** | An edge has only one adjacent face: a hole or an open boundary. |
-| **Manifold joins** | An edge is shared by three or more faces. |
+| **Manifold joins** | An edge is shared by three or more faces, or a vertex has more than one incident face fan. |
 | **Winding** | The two faces on an edge disagree about which way is out. |
 | **Degenerate faces** | Zero-area or invalid triangles. |
 | **Volume** | The signed volume is zero or inward-facing. |
@@ -102,13 +103,14 @@ The verdict is the worst per-object result. A multi-object project passes only w
 | Slice your model | That is the slicer's job, and it has better information than a mesh inspector. |
 | Detect self-intersections | Not in v1. The report does not guess. |
 | Predict wall thickness, overhangs, supports, print time or material use | Those need slicing context. Orientation uses a down-facing area proxy, not a support solver. |
-| Heal non-manifold edges | Safe repair counts them and leaves them in the AFTER report. |
+| Guarantee every non-manifold join is healed | Safe repair only splits a join when the AFTER report improves without opening new edges; remaining joins stay visible. |
+| Preserve every sharp edge through deep repair | Deep repair resamples the surface; preview it, compare the AFTER report, and keep it only if it still prints. |
 | Fix mesh topology during 3MF recovery | Recovery resolves the package structure; the checks and Repair flow still own the mesh. |
 | Know your real print bed | The Orientation Adviser assumes **256 × 256 × 256 mm**, says so, and changes nothing on disk. |
 | Invent STL units | STL has none. ModelViewer assumes millimetres and labels the assumption. |
 | Guarantee a good print | A watertight mesh is necessary, not sufficient. The printer and slicer still get the final say. |
 
-A few extra honest notes: part colors currently come from Bambu-style `model_settings.config` / `project_settings.config` metadata; standard 3MF `basematerials` are not parsed yet. Large binary STLs get the progressive path; 3MF and ASCII STL use the regular loader. Very large 3MF recovery is a package fix, not a mesh fix, and can take a while. The final smooth GPU handoff after a large load is still synchronous.
+A few extra honest notes: part colors currently come from Bambu-style `model_settings.config` / `project_settings.config` metadata; standard 3MF `basematerials` are not parsed yet. Large binary STLs get the progressive path; 3MF and ASCII STL use the regular loader. Very large 3MF recovery is a package fix, not a mesh fix, and can take a while. The final smooth GPU handoff after a large load is still synchronous. Non-manifold healing is conservative: a split that creates new openings or a worse report is declined and counted as a declined pass, not presented as a repair. Deep repair resamples at roughly diagonal/160 (clamped to 0.02–2 mm) and refuses a result that is not watertight or changes volume beyond 4×.
 
 ## Keyboard
 

@@ -1,7 +1,7 @@
 use eframe::egui;
 use modelview_core::{
-    DefectMarker, Format, MeshReport, RepairOptions, RepairStats, Scene, analyze, repair_scene,
-    summarize,
+    DefectMarker, Format, MeshReport, RepairOptions, RepairStats, Scene, analyze,
+    deep_repair_scene, repair_scene, summarize,
 };
 use std::path::PathBuf;
 use std::sync::mpsc::{self, Receiver};
@@ -20,6 +20,7 @@ pub struct RepairSession {
     pub original_summary: MeshReport,
     pub original_markers: Vec<(usize, DefectMarker)>,
     pub options: RepairOptions,
+    pub deep_repair: bool,
     pub revision: u64,
     pub saved_path: Option<PathBuf>,
     pub saved_revision: Option<u64>,
@@ -29,12 +30,20 @@ pub struct RepairSession {
     pub original_saved_path: Option<PathBuf>,
 }
 
-pub fn build_preview(scene: &Scene, options: RepairOptions) -> RepairPreview {
-    let mut options = options;
-    if scene.format == Format::Stl {
-        options.weld = true;
-    }
-    let (repaired, stats) = repair_scene(scene, options);
+pub fn build_preview(
+    scene: &Scene,
+    options: RepairOptions,
+    deep_repair: bool,
+) -> Result<RepairPreview, String> {
+    let (repaired, stats) = if deep_repair {
+        deep_repair_scene(scene).map_err(|error| error.to_string())?
+    } else {
+        let mut options = options;
+        if scene.format == Format::Stl {
+            options.weld = true;
+        }
+        repair_scene(scene, options)
+    };
     let weld = repaired.format == Format::Stl;
     let reports: Vec<MeshReport> = repaired
         .objects
@@ -47,24 +56,26 @@ pub fn build_preview(scene: &Scene, options: RepairOptions) -> RepairPreview {
         .enumerate()
         .flat_map(|(index, report)| report.markers.iter().map(move |marker| (index, *marker)))
         .collect();
-    RepairPreview {
+    Ok(RepairPreview {
         scene: repaired,
         reports,
         summary,
         markers,
         stats,
-    }
+    })
 }
 
 pub fn start_repair(
     scene: Scene,
     options: RepairOptions,
+    deep_repair: bool,
     ctx: egui::Context,
 ) -> Receiver<Result<RepairPreview, String>> {
     let (tx, rx) = mpsc::channel();
     std::thread::spawn(move || {
-        let result = std::panic::catch_unwind(|| build_preview(&scene, options))
-            .map_err(|_| "The repair worker failed.".to_string());
+        let result = std::panic::catch_unwind(|| build_preview(&scene, options, deep_repair))
+            .map_err(|_| "The repair worker failed.".to_string())
+            .and_then(|result| result);
         let _ = tx.send(result);
         ctx.request_repaint();
     });
@@ -115,7 +126,7 @@ mod tests {
             weld: false,
             ..RepairOptions::default()
         };
-        let preview = build_preview(&scene, options);
+        let preview = build_preview(&scene, options, false).unwrap();
         assert_eq!(preview.summary.open_edges, 0);
         assert_eq!(preview.summary.triangles, 6);
         assert_eq!(preview.scene.objects[0].mesh.triangle_count(), 6);
@@ -126,10 +137,18 @@ mod tests {
         let scene = broken_stl_scene();
         let before = modelview_core::analyze(&scene.objects[0].mesh, true);
         assert!(before.open_edges > 0);
-        let preview = build_preview(&scene, RepairOptions::default());
+        let preview = build_preview(&scene, RepairOptions::default(), false).unwrap();
         assert_eq!(preview.summary.open_edges, 0);
         assert_eq!(preview.summary.inconsistent_edges, 0);
         let after_original = modelview_core::analyze(&scene.objects[0].mesh, true);
         assert_eq!(after_original.open_edges, before.open_edges);
+    }
+
+    #[test]
+    fn deep_preview_rebuilds_a_broken_scene() {
+        let scene = broken_stl_scene();
+        let preview = build_preview(&scene, RepairOptions::default(), true).unwrap();
+        assert!(preview.summary.is_watertight());
+        assert!(preview.stats.iter().any(|stats| stats.deep_remeshed));
     }
 }

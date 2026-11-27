@@ -60,6 +60,7 @@ pub struct MeshReport {
     pub vertices: usize,
     pub open_edges: usize,
     pub non_manifold_edges: usize,
+    pub non_manifold_vertices: usize,
     pub inconsistent_edges: usize,
     pub degenerate_triangles: usize,
     pub invalid_triangles: usize,
@@ -80,6 +81,7 @@ impl Default for MeshReport {
             vertices: 0,
             open_edges: 0,
             non_manifold_edges: 0,
+            non_manifold_vertices: 0,
             inconsistent_edges: 0,
             degenerate_triangles: 0,
             invalid_triangles: 0,
@@ -101,6 +103,7 @@ impl MeshReport {
         self.triangles > 0
             && self.open_edges == 0
             && self.non_manifold_edges == 0
+            && self.non_manifold_vertices == 0
             && self.inconsistent_edges == 0
             && self.invalid_triangles == 0
     }
@@ -129,12 +132,9 @@ impl MeshReport {
                 s(self.shells)
             );
         }
-        if self.non_manifold_edges > 0 {
-            return format!(
-                "{} non-manifold edge{}",
-                n(self.non_manifold_edges),
-                s(self.non_manifold_edges)
-            );
+        if self.non_manifold_edges > 0 || self.non_manifold_vertices > 0 {
+            let joins = self.non_manifold_edges + self.non_manifold_vertices;
+            return format!("{} non-manifold join{}", n(joins), s(joins));
         }
         if self.inconsistent_edges > 0 {
             return format!(
@@ -310,6 +310,10 @@ pub fn analyze(mesh: &Mesh, weld_positions: bool) -> MeshReport {
         }
     }
 
+    let (non_manifold_vertices, non_manifold_vertex_positions) =
+        find_non_manifold_vertices(mesh, &edges, vertex_count);
+    report.non_manifold_vertices = non_manifold_vertices;
+
     let mut uf = UnionFind::new(mesh.indices.len() as u32);
     for (a, b) in &shell_pairs {
         uf.union(*a, *b);
@@ -350,6 +354,13 @@ pub fn analyze(mesh: &Mesh, weld_positions: bool) -> MeshReport {
         DefectKind::DegenerateFace,
         &mut markers,
     );
+    for vertex in non_manifold_vertex_positions {
+        markers.push(DefectMarker {
+            kind: DefectKind::NonManifold,
+            position: mesh.positions[vertex as usize],
+            count: 1,
+        });
+    }
     markers.sort_by_key(|marker| std::cmp::Reverse(marker.count));
     markers.truncate(8);
     report.markers = markers;
@@ -507,6 +518,119 @@ impl UnionFind {
     }
 }
 
+fn find_non_manifold_vertices(
+    mesh: &Mesh,
+    edges: &FxHashMap<u64, EdgeAcc>,
+    vertex_count: usize,
+) -> (usize, Vec<u32>) {
+    let triangle_count = mesh.indices.len();
+    if triangle_count == 0 || vertex_count == 0 {
+        return (0, Vec::new());
+    }
+
+    let mut counts = vec![0usize; vertex_count];
+    for t in &mesh.indices {
+        if t.iter().all(|i| (*i as usize) < vertex_count) {
+            counts[t[0] as usize] += 1;
+            counts[t[1] as usize] += 1;
+            counts[t[2] as usize] += 1;
+        }
+    }
+    let mut offsets = vec![0usize; vertex_count + 1];
+    for vertex in 0..vertex_count {
+        offsets[vertex + 1] = offsets[vertex] + counts[vertex];
+    }
+    let mut cursors = offsets[..vertex_count].to_vec();
+    let mut incident = vec![0u32; offsets[vertex_count]];
+    for (triangle, t) in mesh.indices.iter().enumerate() {
+        if t.iter().any(|i| (*i as usize) >= vertex_count) {
+            continue;
+        }
+        for vertex in t {
+            let index = *vertex as usize;
+            incident[cursors[index]] = triangle as u32;
+            cursors[index] += 1;
+        }
+    }
+
+    let mut visited = vec![0u32; triangle_count];
+    let mut stamp = 0u32;
+    let mut count = 0usize;
+    let mut positions = Vec::new();
+    let mut stack = Vec::new();
+
+    for vertex in 0..vertex_count {
+        let start = offsets[vertex];
+        let end = offsets[vertex + 1];
+        if end.saturating_sub(start) < 2 {
+            continue;
+        }
+        stamp = stamp.wrapping_add(1);
+        if stamp == 0 {
+            visited.fill(0);
+            stamp = 1;
+        }
+        let mut components = 0usize;
+        for &triangle in &incident[start..end] {
+            if visited[triangle as usize] == stamp {
+                continue;
+            }
+            components += 1;
+            if components > 1 {
+                break;
+            }
+            visited[triangle as usize] = stamp;
+            stack.push(triangle);
+            while let Some(current) = stack.pop() {
+                let tri = mesh.indices[current as usize];
+                let corner = if tri[0] == vertex as u32 {
+                    0
+                } else if tri[1] == vertex as u32 {
+                    1
+                } else if tri[2] == vertex as u32 {
+                    2
+                } else {
+                    continue;
+                };
+                let next = tri[(corner + 1) % 3];
+                let previous = tri[(corner + 2) % 3];
+                for other in [next, previous] {
+                    let key = if (vertex as u32) < other {
+                        ((vertex as u64) << 32) | other as u64
+                    } else {
+                        ((other as u64) << 32) | vertex as u64
+                    };
+                    let Some(acc) = edges.get(&key) else {
+                        continue;
+                    };
+                    if acc.count != 2 {
+                        continue;
+                    }
+                    let neighbor = if acc.tri_a == current {
+                        acc.tri_b
+                    } else if acc.tri_b == current {
+                        acc.tri_a
+                    } else {
+                        continue;
+                    };
+                    if visited[neighbor as usize] != stamp {
+                        visited[neighbor as usize] = stamp;
+                        stack.push(neighbor);
+                    }
+                }
+            }
+        }
+        if components > 1 {
+            count += 1;
+            if positions.len() < 64 {
+                positions.push(vertex as u32);
+            }
+        }
+    }
+
+    (count, positions)
+}
+
 /// Aggregate per-object reports into one scene-level report.
 pub fn summarize(reports: &[MeshReport]) -> MeshReport {
     let mut out = MeshReport::default();
@@ -515,6 +639,7 @@ pub fn summarize(reports: &[MeshReport]) -> MeshReport {
         out.vertices += r.vertices;
         out.open_edges += r.open_edges;
         out.non_manifold_edges += r.non_manifold_edges;
+        out.non_manifold_vertices += r.non_manifold_vertices;
         out.inconsistent_edges += r.inconsistent_edges;
         out.degenerate_triangles += r.degenerate_triangles;
         out.invalid_triangles += r.invalid_triangles;
@@ -549,6 +674,7 @@ mod tests {
         let r = analyze(&tetra(), false);
         assert_eq!(r.open_edges, 0);
         assert_eq!(r.non_manifold_edges, 0);
+        assert_eq!(r.non_manifold_vertices, 0);
         assert_eq!(r.inconsistent_edges, 0);
         assert_eq!(r.shells, 1);
         assert!((r.volume_mm3 - 1.0 / 6.0).abs() < 1e-9);
@@ -561,6 +687,7 @@ mod tests {
         mesh.indices.pop();
         let r = analyze(&mesh, false);
         assert_eq!(r.open_edges, 3);
+        assert_eq!(r.non_manifold_vertices, 0);
         assert_eq!(r.verdict(), Verdict::Failed);
         assert_eq!(r.markers.len(), 1);
         assert_eq!(r.markers[0].kind, DefectKind::OpenEdge);
@@ -595,6 +722,25 @@ mod tests {
         assert_eq!(welded.verdict(), Verdict::Watertight);
     }
 
+    fn two_tetrahedra_sharing_one_vertex() -> Mesh {
+        let mut mesh = tetra();
+        mesh.positions
+            .extend([[-1.0, 0.0, 0.0], [0.0, -1.0, 0.0], [0.0, 0.0, -1.0]]);
+        mesh.indices
+            .extend([[0, 5, 4], [0, 4, 6], [0, 6, 5], [4, 5, 6]]);
+        mesh
+    }
+
+    #[test]
+    fn vertex_only_join_is_not_watertight() {
+        let mesh = two_tetrahedra_sharing_one_vertex();
+        let r = analyze(&mesh, false);
+        assert_eq!(r.open_edges, 0);
+        assert_eq!(r.non_manifold_edges, 0);
+        assert_eq!(r.non_manifold_vertices, 1);
+        assert_eq!(r.verdict(), Verdict::Failed);
+    }
+
     #[test]
     fn two_shells_are_counted() {
         let mut mesh = tetra();
@@ -605,6 +751,7 @@ mod tests {
         let r = analyze(&mesh, false);
         assert_eq!(r.shells, 2);
         assert_eq!(r.open_edges, 0);
+        assert_eq!(r.non_manifold_vertices, 0);
         assert!((r.volume_mm3 - 2.0 / 6.0).abs() < 1e-9);
     }
 

@@ -1,3 +1,4 @@
+use crate::analysis::{MeshReport, analyze};
 use crate::mesh::{Mesh, weld};
 use crate::scene::Scene;
 use glam::Vec3;
@@ -8,6 +9,7 @@ pub struct RepairOptions {
     pub weld: bool,
     pub remove_degenerate: bool,
     pub remove_duplicate_faces: bool,
+    pub heal_non_manifold: bool,
     pub fix_winding: bool,
     pub fill_holes: bool,
 }
@@ -18,6 +20,7 @@ impl Default for RepairOptions {
             weld: true,
             remove_degenerate: true,
             remove_duplicate_faces: true,
+            heal_non_manifold: true,
             fix_winding: true,
             fill_holes: true,
         }
@@ -33,37 +36,248 @@ pub struct RepairStats {
     pub holes_filled: usize,
     pub patch_faces: usize,
     pub unfilled_loops: usize,
+    pub non_manifold_edges_healed: usize,
+    pub non_manifold_vertices_healed: usize,
     pub unresolved_non_manifold: usize,
+    pub passes_rolled_back: usize,
+    pub deep_remeshed: bool,
+    pub voxel_size_mm: f32,
 }
 
 pub fn repair_mesh(mesh: &Mesh, options: RepairOptions) -> (Mesh, RepairStats) {
     let mut stats = RepairStats::default();
-    let mut out = if options.weld {
-        let welded = weld(mesh);
-        stats.welded_vertices = mesh.positions.len().saturating_sub(welded.positions.len());
-        welded
-    } else {
-        mesh.clone()
-    };
+    let mut out = mesh.clone();
+    let mut report = analyze(&out, false);
 
+    let mut cleanup = out.clone();
+    let mut cleanup_stats = RepairStats::default();
+    let mut cleanup_passes = 0usize;
+    if options.weld {
+        let welded = weld(&cleanup);
+        let removed = cleanup
+            .positions
+            .len()
+            .saturating_sub(welded.positions.len());
+        if removed > 0 {
+            cleanup = welded;
+            cleanup_stats.welded_vertices = removed;
+            cleanup_passes += 1;
+        }
+    }
     if options.remove_degenerate {
-        remove_invalid_and_degenerate(&mut out, &mut stats);
+        let mut delta = RepairStats::default();
+        remove_invalid_and_degenerate(&mut cleanup, &mut delta);
+        if delta.degenerate_removed > 0 {
+            cleanup_stats.merge(&delta);
+            cleanup_passes += 1;
+        }
     }
     if options.remove_duplicate_faces {
-        remove_duplicate_faces(&mut out, &mut stats);
+        let mut delta = RepairStats::default();
+        remove_duplicate_faces(&mut cleanup, &mut delta);
+        if delta.duplicates_removed > 0 {
+            cleanup_stats.merge(&delta);
+            cleanup_passes += 1;
+        }
     }
+    if cleanup_passes > 0 {
+        commit_group(
+            &mut out,
+            &mut report,
+            &mut stats,
+            cleanup,
+            PassKind::Cleanup,
+            cleanup_stats,
+            cleanup_passes,
+        );
+    }
+
+    if options.heal_non_manifold && report.non_manifold_edges + report.non_manifold_vertices > 0 {
+        let before_edges = report.non_manifold_edges;
+        let mut candidate = out.clone();
+        let non_manifold_vertices_healed = split_non_manifold_vertices(&mut candidate);
+        let non_manifold_edges_healed = before_edges.saturating_sub(count_non_manifold(&candidate));
+        let delta = RepairStats {
+            non_manifold_edges_healed,
+            non_manifold_vertices_healed,
+            ..Default::default()
+        };
+        if delta.non_manifold_vertices_healed > 0 || delta.non_manifold_edges_healed > 0 {
+            commit_if_improved(
+                &mut out,
+                &mut report,
+                &mut stats,
+                candidate,
+                PassKind::Heal,
+                delta,
+            );
+        }
+    }
+
     if options.fix_winding {
-        stats.faces_flipped = fix_winding(&mut out);
+        let mut candidate = out.clone();
+        let faces_flipped = fix_winding(&mut candidate);
+        let delta = RepairStats {
+            faces_flipped,
+            ..Default::default()
+        };
+        if delta.faces_flipped > 0 {
+            commit_if_improved(
+                &mut out,
+                &mut report,
+                &mut stats,
+                candidate,
+                PassKind::Winding,
+                delta,
+            );
+        }
     }
+
     if options.fill_holes {
-        let filled = fill_holes(&mut out);
-        stats.holes_filled = filled.holes;
-        stats.patch_faces = filled.faces;
-        stats.unfilled_loops = filled.unfilled;
+        let mut candidate = out.clone();
+        let mut delta = RepairStats::default();
+        let filled = fill_holes(&mut candidate);
+        delta.holes_filled = filled.holes;
+        delta.patch_faces = filled.faces;
+        delta.unfilled_loops = filled.unfilled;
+        if delta.holes_filled > 0 {
+            commit_if_improved(
+                &mut out,
+                &mut report,
+                &mut stats,
+                candidate,
+                PassKind::Fill,
+                delta,
+            );
+        }
     }
+
     remove_unreferenced(&mut out);
-    stats.unresolved_non_manifold = count_non_manifold(&out);
+    stats.unresolved_non_manifold = report.non_manifold_edges + report.non_manifold_vertices;
     (out, stats)
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum PassKind {
+    Cleanup,
+    Heal,
+    Winding,
+    Fill,
+}
+
+fn commit_if_improved(
+    out: &mut Mesh,
+    report: &mut MeshReport,
+    stats: &mut RepairStats,
+    candidate: Mesh,
+    kind: PassKind,
+    delta: RepairStats,
+) {
+    commit_group(out, report, stats, candidate, kind, delta, 1);
+}
+
+fn commit_group(
+    out: &mut Mesh,
+    report: &mut MeshReport,
+    stats: &mut RepairStats,
+    candidate: Mesh,
+    kind: PassKind,
+    delta: RepairStats,
+    changed_passes: usize,
+) {
+    let after = analyze(&candidate, false);
+    if pass_improves(report, &after, kind) {
+        *out = candidate;
+        *report = after;
+        stats.merge(&delta);
+    } else {
+        stats.passes_rolled_back += changed_passes;
+    }
+}
+
+fn defect_score(report: &MeshReport) -> u64 {
+    report.open_edges as u64
+        + report.non_manifold_edges as u64 * 2
+        + report.non_manifold_vertices as u64 * 2
+        + report.inconsistent_edges as u64 * 2
+        + report.degenerate_triangles as u64
+        + report.invalid_triangles as u64 * 2
+}
+
+fn closed(report: &MeshReport) -> bool {
+    report.open_edges == 0
+        && report.non_manifold_edges == 0
+        && report.non_manifold_vertices == 0
+        && report.inconsistent_edges == 0
+        && report.invalid_triangles == 0
+}
+
+fn volume_survives(before: &MeshReport, after: &MeshReport) -> bool {
+    if !closed(before) || !closed(after) {
+        return true;
+    }
+    let before_volume = before.volume_mm3;
+    after.volume_mm3 >= before_volume * 0.5 || before_volume <= 1e-9
+}
+
+fn pass_improves(before: &MeshReport, after: &MeshReport, kind: PassKind) -> bool {
+    if after.triangles == 0 && before.triangles > 0 {
+        return false;
+    }
+    if !volume_survives(before, after) {
+        return false;
+    }
+    let before_score = defect_score(before);
+    let after_score = defect_score(after);
+    match kind {
+        PassKind::Cleanup => {
+            after_score < before_score
+                || (after_score == before_score
+                    && (after.triangles < before.triangles || after.vertices < before.vertices))
+        }
+        PassKind::Heal => {
+            after.open_edges <= before.open_edges
+                && after_score < before_score
+                && (after.non_manifold_edges + after.non_manifold_vertices)
+                    < (before.non_manifold_edges + before.non_manifold_vertices)
+        }
+        PassKind::Winding => {
+            after.open_edges <= before.open_edges
+                && after.non_manifold_edges <= before.non_manifold_edges
+                && after.non_manifold_vertices <= before.non_manifold_vertices
+                && (after.inconsistent_edges < before.inconsistent_edges
+                    || (after.inconsistent_edges == before.inconsistent_edges
+                        && after.signed_volume_mm3 > before.signed_volume_mm3 + 1e-9))
+        }
+        PassKind::Fill => {
+            after.open_edges < before.open_edges
+                && after.non_manifold_edges <= before.non_manifold_edges
+                && after.non_manifold_vertices <= before.non_manifold_vertices
+                && after.inconsistent_edges <= before.inconsistent_edges
+                && after.degenerate_triangles <= before.degenerate_triangles
+                && after.invalid_triangles <= before.invalid_triangles
+        }
+    }
+}
+
+impl RepairStats {
+    pub(crate) fn merge(&mut self, other: &Self) {
+        self.welded_vertices += other.welded_vertices;
+        self.degenerate_removed += other.degenerate_removed;
+        self.duplicates_removed += other.duplicates_removed;
+        self.faces_flipped += other.faces_flipped;
+        self.holes_filled += other.holes_filled;
+        self.patch_faces += other.patch_faces;
+        self.unfilled_loops += other.unfilled_loops;
+        self.non_manifold_edges_healed += other.non_manifold_edges_healed;
+        self.non_manifold_vertices_healed += other.non_manifold_vertices_healed;
+        self.unresolved_non_manifold += other.unresolved_non_manifold;
+        self.passes_rolled_back += other.passes_rolled_back;
+        self.deep_remeshed |= other.deep_remeshed;
+        if other.voxel_size_mm > 0.0 {
+            self.voxel_size_mm = other.voxel_size_mm;
+        }
+    }
 }
 
 fn triangle_area2(a: [f32; 3], b: [f32; 3], c: [f32; 3]) -> f64 {
@@ -151,6 +365,170 @@ fn edge_key(a: u32, b: u32) -> u64 {
     } else {
         ((b as u64) << 32) | a as u64
     }
+}
+
+#[derive(Clone, Copy, Default)]
+struct RepairEdge {
+    count: u32,
+    tri_a: u32,
+    tri_b: u32,
+}
+
+struct SplitVertex {
+    corners: Vec<u32>,
+    labels: Vec<u32>,
+    ids: Vec<u32>,
+}
+
+fn split_non_manifold_vertices(mesh: &mut Mesh) -> usize {
+    let vertex_count = mesh.positions.len();
+    let triangle_count = mesh.indices.len();
+    if vertex_count == 0 || triangle_count == 0 {
+        return 0;
+    }
+
+    let edges = repair_edges(mesh);
+    let (offsets, incident) = incident_corners(mesh, vertex_count);
+    let mut visited = vec![0u32; triangle_count];
+    let mut labels = vec![0u32; triangle_count];
+    let mut stamp = 0u32;
+    let mut splits = Vec::new();
+    let mut stack = Vec::new();
+
+    for vertex in 0..vertex_count {
+        let start = offsets[vertex];
+        let end = offsets[vertex + 1];
+        if end.saturating_sub(start) < 2 {
+            continue;
+        }
+        stamp = stamp.wrapping_add(1);
+        if stamp == 0 {
+            visited.fill(0);
+            stamp = 1;
+        }
+        let mut components = 0u32;
+        for &corner in &incident[start..end] {
+            let triangle = corner / 3;
+            if visited[triangle as usize] == stamp {
+                continue;
+            }
+            components += 1;
+            visited[triangle as usize] = stamp;
+            labels[triangle as usize] = components;
+            stack.push(triangle);
+            while let Some(current) = stack.pop() {
+                let tri = mesh.indices[current as usize];
+                let Some(corner) = tri.iter().position(|index| *index as usize == vertex) else {
+                    continue;
+                };
+                let next = tri[(corner + 1) % 3];
+                let previous = tri[(corner + 2) % 3];
+                for other in [next, previous] {
+                    let key = edge_key(vertex as u32, other);
+                    let Some(edge) = edges.get(&key) else {
+                        continue;
+                    };
+                    if edge.count != 2 {
+                        continue;
+                    }
+                    let neighbor = if edge.tri_a == current {
+                        edge.tri_b
+                    } else if edge.tri_b == current {
+                        edge.tri_a
+                    } else {
+                        continue;
+                    };
+                    if neighbor != current && visited[neighbor as usize] != stamp {
+                        visited[neighbor as usize] = stamp;
+                        labels[neighbor as usize] = components;
+                        stack.push(neighbor);
+                    }
+                }
+            }
+        }
+        if components < 2 {
+            continue;
+        }
+        let mut ids = Vec::with_capacity(components as usize);
+        ids.push(vertex as u32);
+        for _ in 1..components {
+            let id = mesh.positions.len() as u32;
+            mesh.positions.push(mesh.positions[vertex]);
+            ids.push(id);
+        }
+        let mut corners = Vec::with_capacity(end - start);
+        let mut split_labels = Vec::with_capacity(end - start);
+        for &corner in &incident[start..end] {
+            corners.push(corner);
+            split_labels.push(labels[(corner / 3) as usize]);
+        }
+        splits.push(SplitVertex {
+            corners,
+            labels: split_labels,
+            ids,
+        });
+    }
+
+    let count = splits.len();
+    for split in splits {
+        for (corner, label) in split.corners.into_iter().zip(split.labels) {
+            let triangle = (corner / 3) as usize;
+            let corner = (corner % 3) as usize;
+            mesh.indices[triangle][corner] = split.ids[(label - 1) as usize];
+        }
+    }
+    count
+}
+
+fn repair_edges(mesh: &Mesh) -> FxHashMap<u64, RepairEdge> {
+    let mut edges: FxHashMap<u64, RepairEdge> = FxHashMap::default();
+    for (triangle, tri) in mesh.indices.iter().enumerate() {
+        if tri
+            .iter()
+            .any(|index| (*index as usize) >= mesh.positions.len())
+        {
+            continue;
+        }
+        for (a, b) in [(tri[0], tri[1]), (tri[1], tri[2]), (tri[2], tri[0])] {
+            let edge = edges.entry(edge_key(a, b)).or_default();
+            edge.count += 1;
+            if edge.count == 1 {
+                edge.tri_a = triangle as u32;
+            } else if edge.count == 2 {
+                edge.tri_b = triangle as u32;
+            }
+        }
+    }
+    edges
+}
+
+fn incident_corners(mesh: &Mesh, vertex_count: usize) -> (Vec<usize>, Vec<u32>) {
+    let mut counts = vec![0usize; vertex_count];
+    for tri in &mesh.indices {
+        if tri.iter().any(|index| (*index as usize) >= vertex_count) {
+            continue;
+        }
+        for index in tri {
+            counts[*index as usize] += 1;
+        }
+    }
+    let mut offsets = vec![0usize; vertex_count + 1];
+    for vertex in 0..vertex_count {
+        offsets[vertex + 1] = offsets[vertex] + counts[vertex];
+    }
+    let mut cursors = offsets[..vertex_count].to_vec();
+    let mut corners = vec![0u32; offsets[vertex_count]];
+    for (triangle, tri) in mesh.indices.iter().enumerate() {
+        if tri.iter().any(|index| (*index as usize) >= vertex_count) {
+            continue;
+        }
+        for (corner, vertex) in tri.iter().enumerate() {
+            let vertex = *vertex as usize;
+            corners[cursors[vertex]] = (triangle * 3 + corner) as u32;
+            cursors[vertex] += 1;
+        }
+    }
+    (offsets, corners)
 }
 
 fn count_non_manifold(mesh: &Mesh) -> usize {
@@ -514,6 +892,7 @@ mod tests {
             weld: true,
             remove_degenerate: true,
             remove_duplicate_faces: true,
+            heal_non_manifold: true,
             fix_winding: true,
             fill_holes: false,
         }
@@ -562,6 +941,42 @@ mod tests {
         mesh
     }
 
+    fn two_tetrahedra_sharing_edge() -> Mesh {
+        let mut mesh = tetra();
+        mesh.positions.extend([[0.0, -1.0, 0.0], [0.0, 0.0, -1.0]]);
+        mesh.indices
+            .extend([[0, 4, 1], [0, 1, 5], [0, 5, 4], [1, 4, 5]]);
+        mesh
+    }
+
+    fn expanded(mesh: &Mesh) -> Mesh {
+        let mut expanded = Mesh::default();
+        for tri in &mesh.indices {
+            let base = expanded.positions.len() as u32;
+            for corner in tri {
+                expanded.positions.push(mesh.positions[*corner as usize]);
+            }
+            expanded.indices.push([base, base + 1, base + 2]);
+        }
+        expanded
+    }
+
+    fn tetra_with_fin() -> Mesh {
+        let mut mesh = tetra();
+        mesh.positions.push([2.0, 2.0, 2.0]);
+        mesh.indices.push([0, 1, 4]);
+        mesh
+    }
+
+    fn two_tetrahedra_sharing_vertex() -> Mesh {
+        let mut mesh = tetra();
+        mesh.positions
+            .extend([[-1.0, 0.0, 0.0], [0.0, -1.0, 0.0], [0.0, 0.0, -1.0]]);
+        mesh.indices
+            .extend([[0, 5, 4], [0, 4, 6], [0, 6, 5], [4, 5, 6]]);
+        mesh
+    }
+
     fn warped_quad() -> Mesh {
         Mesh {
             positions: vec![
@@ -583,6 +998,7 @@ mod tests {
                 weld: true,
                 remove_degenerate: true,
                 remove_duplicate_faces: true,
+                heal_non_manifold: false,
                 fix_winding: false,
                 fill_holes: false,
             },
@@ -591,6 +1007,23 @@ mod tests {
         assert_eq!(stats.degenerate_removed, 1);
         assert_eq!(stats.duplicates_removed, 1);
         assert_eq!(out.triangle_count(), 4);
+    }
+
+    #[test]
+    fn unwelded_stl_is_welded_before_other_passes() {
+        let mut mesh = tetra();
+        mesh.indices[0].swap(1, 2);
+        let expanded = expanded(&mesh);
+
+        let (out, stats) = repair_mesh(&expanded, repair_all());
+        let report = analyze(&out, false);
+
+        assert_eq!(report.open_edges, 0);
+        assert_eq!(report.inconsistent_edges, 0);
+        assert_eq!(report.shells, 1);
+        assert_eq!(report.triangles, 4);
+        assert!(stats.welded_vertices > 0);
+        assert_eq!(stats.holes_filled, 0);
     }
 
     #[test]
@@ -652,15 +1085,52 @@ mod tests {
     }
 
     #[test]
-    fn non_manifold_edges_remain_reported_not_repaired() {
-        let mut mesh = tetra();
-        mesh.positions.push([2.0, 2.0, 2.0]);
-        mesh.indices.push([0, 1, 4]);
+    fn shared_edge_between_shells_is_split() {
+        let mesh = two_tetrahedra_sharing_edge();
+        let before = analyze(&mesh, false);
+        assert_eq!(before.open_edges, 0);
+        assert_eq!(before.non_manifold_edges, 1);
+
         let (out, stats) = repair_mesh(&mesh, repair_all());
         let report = analyze(&out, false);
+
+        assert_eq!(report.open_edges, 0);
+        assert_eq!(report.non_manifold_edges, 0);
+        assert_eq!(report.non_manifold_vertices, 0);
+        assert_eq!(report.shells, 2);
+        assert_eq!(stats.unresolved_non_manifold, 0);
+    }
+
+    #[test]
+    fn healing_does_not_turn_a_fin_into_a_closed_shell() {
+        let mesh = tetra_with_fin();
+        let before = analyze(&mesh, false);
+        assert_eq!(before.non_manifold_edges, 1);
+
+        let (out, stats) = repair_mesh(&mesh, repair_all());
+        let report = analyze(&out, false);
+
         assert!(report.non_manifold_edges > 0);
-        assert!(stats.unresolved_non_manifold > 0);
-        assert_ne!(report.verdict(), crate::analysis::Verdict::Watertight);
+        assert!(!report.is_watertight());
+        assert_eq!(stats.non_manifold_edges_healed, 0);
+        assert!(stats.passes_rolled_back >= 1);
+    }
+
+    #[test]
+    fn shared_vertex_between_shells_is_split() {
+        let mesh = two_tetrahedra_sharing_vertex();
+        let before = analyze(&mesh, false);
+        assert_eq!(before.open_edges, 0);
+        assert_eq!(before.non_manifold_vertices, 1);
+
+        let (out, stats) = repair_mesh(&mesh, repair_all());
+        let report = analyze(&out, false);
+
+        assert_eq!(report.open_edges, 0);
+        assert_eq!(report.non_manifold_edges, 0);
+        assert_eq!(report.non_manifold_vertices, 0);
+        assert_eq!(report.shells, 2);
+        assert_eq!(stats.unresolved_non_manifold, 0);
     }
 
     #[test]

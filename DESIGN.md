@@ -219,7 +219,7 @@ The surface is black at every layer: viewport, top strip, rail, inspector and st
 
 The type ramp is deliberately larger than the first release for high-resolution displays: 76px wordmark, 44px verdict, 18px data, 15px row labels, 12.5px explanations, 11.5px metas, 10px rail labels. Density stays high because the content is dense; legibility comes first. The earlier charcoal/bone/sodium surface was retired at the user's request; the rail, callout and timing structures survive.
 
-Two Blueprint sheets carry the handoff. Settings lists detected slicers as square radio rows and a custom Browse path; Repair pairs before/after counts with five square checkboxes, a filled Keep action, and a Send that also fills when a slicer is configured. Both are opaque black plates with a 1px Hairline Bright border, 0px corners and no shadow; they sit over the report, not inside it. A live repair is marked by a `REPAIRED PREVIEW` viewport chip; after Keep, `REPAIRED` replaces it. The chips are white like every other instrument tag, never a new accent.
+Two Blueprint sheets carry the handoff. Settings lists detected slicers as square radio rows and a custom Browse path; Repair pairs before/after counts with six safe-pass checkboxes plus an explicit Deep remesh row, a filled Keep action, and a Send that also fills when a slicer is configured. Both are opaque black plates with a 1px Hairline Bright border, 0px corners and no shadow; they sit over the report, not inside it. A live repair is marked by a `REPAIRED PREVIEW` viewport chip; after Keep, `REPAIRED` replaces it. The chips are white like every other instrument tag, never a new accent.
 
 Defect Theater is the one authored performance. The camera flies to a chosen defect, the specimen becomes a ghost, the focused ink and a White focus frame hold the eye, and a topology loupe reads the local topology. It adds motion and focus, not new checks or a new palette.
 
@@ -350,11 +350,11 @@ Every UI corner is 0px. Recurring marks are 1px hairlines, 2px verdict/error rul
 
 ### Repair Sheet
 - **Shape:** 540px content on the same opaque black plate, centered; no title bar or shadow. The sheet is a diagnostic instrument, not a wizard. The topbar, rail and inspector dim behind it, while the live preview and status readout stay lit.
-- **Anatomy:** `REPAIR / <file>`; `BEFORE` and `AFTER` metric lines (Open, Winding, Degenerate, Non-manifold, Shells); five 40px option rows; one disclaimer; the Keep/Revert and Save/Send rows; Close. The AFTER values are white when the preview is watertight and Signal Red Text when it still fails. `NO SAFE REPAIR APPLIED` appears when no pass changed anything; Keep is disabled in that state.
+- **Anatomy:** `REPAIR / <file>`; `BEFORE` and `AFTER` metric lines (Open, Winding, Degenerate, Non-manifold edges plus vertices, Shells); six safe-pass option rows; a separated Deep remesh row; one disclaimer; the Keep/Revert and Save/Send rows; Close. The AFTER values are white when the preview is watertight and Signal Red Text when it still fails. `NO SAFE REPAIR APPLIED` appears when no pass changed anything; Keep is disabled in that state. Below 760px tall, option rows compact from 40 to 34px.
 - **Repair option row:** 40px, 16px square checkbox, 12.5px label, right-aligned 11px count. Hover and click; keyboard focus is the 1px Electric Blue ring. Rows are disabled (Graphite Faint, no focus) while the preview job runs; changing a row starts a new preview. Weld is locked on for STL, because an unindexed STL cannot be safely unwelded; it reads in Graphite, not the disabled Faint.
 - **Viewport state:** the repaired mesh renders behind the sheet with a `REPAIRED PREVIEW` chip; the side report switches to the preview analysis, while the original stays retained for Revert. After Keep the chip becomes `REPAIRED`.
 - **Actions:** Keep repaired is filled blue; Revert and Save repaired copy… are outlined. Send is filled when a slicer is configured and outlined with `SET UP SLICER` otherwise. Save defaults to `<stem>.repaired.<ext>`, keeps the source format, and never overwrites the source.
-- **Safety:** the disclaimer names the fan patch and states that non-manifold edges stay unresolved and self-intersections are not checked. The sheet never claims those were fixed.
+- **Safety:** the disclaimer names the fan patch, states that non-manifold joins are split only when the AFTER report improves, and that self-intersections are not checked. The sheet never claims a declined split was fixed. Deep remesh has its own warning: SDF rebuild, detail may change, only a watertight result is kept, source untouched.
 
 ### REPAIRED Tags
 - **Style:** the same 26px viewport chip as GRID ON and DEFECTS: opaque black, 1px Hairline Bright border, 0px corners, 9px tracked white caps.
@@ -362,7 +362,7 @@ Every UI corner is 0px. Recurring marks are 1px hairlines, 2px verdict/error rul
 
 **The Explicit Repair Rule.** Repair is previewed on the real scene; Keep is the only way to mark `REPAIRED`, and the source file is never overwritten. A no-op preview says so and cannot be kept.
 
-**The Safe Claim Rule.** The repair reports only the five safe passes. Non-manifold edges remain reported and self-intersections are not checked; the interface never implies otherwise.
+**The Safe Claim Rule.** The repair reports only the six safe passes, each validated against the real AFTER report. A non-manifold split is accepted only when it improves the report without opening new edges; a declined pass stays visible as a declined pass. Deep remesh is a separate opt-in rebuild, never counted as a safe pass, and is offered only when the result is watertight. Self-intersections are not checked; the interface never implies otherwise.
 
 **The Defined Part Color Rule.** A 3MF's own part colors replace the cool palette. Dark print colors are lifted 32% toward white for the black plate; the object-row swatch shows the source color; undefined parts keep the Clay order. Color is per object, never invented per face. A warm part color is user content, not a sodium accent.
 
@@ -462,7 +462,8 @@ A 28px black-filled circle with a 1px defect-ink stroke, a centered 12px number,
 - **Do** show real parse and check timings; label synthetic samples and the STL millimetre assumption.
 - **Do** use opaque black sheets with a 1px Hairline Bright border and 0px corners; they are plates, not cards.
 - **Do** mark `REPAIRED PREVIEW` while previewing and `REPAIRED` only after Keep; disable Keep when no safe pass changed geometry.
-- **Do** state what repair did not heal; non-manifold edges are reported, never claimed fixed.
+- **Do** state what repair did not heal; remaining non-manifold joins are reported, never claimed fixed.
+- **Do** label deep remesh as a rebuild, warn that detail may change, and keep it opt-in.
 - **Do** ghost the specimen, not the defect; keep the focused kind in its ink and the rest of the field quiet.
 - **Do** use the White focus frame and the Blue selected-marker ring; no colored disc, halo or bloom.
 - **Do** keep the side report live in theater and return the camera on `Esc`.
@@ -479,7 +480,7 @@ A 28px black-filled circle with a 1px defect-ink stroke, a centered 12px number,
 - **Don't** show idle FPS or invented performance numbers.
 - **Don't** use warm clay or sodium/warm-yellow accents; the surface is black, white and cool blue.
 - **Don't** put a second status stack beside the calibrated rail.
-- **Don't** claim non-manifold healing or self-intersection detection; neither is in the safe repair.
+- **Don't** claim every non-manifold join was healed or that self-intersections are detected; the safe repair is conservative. Don't present deep remesh as safe or detail-preserving.
 - **Don't** overwrite the source file when saving or sending a repair.
 - **Don't** add particles, bloom, glow, chromatic aberration or idle loops to theater.
 - **Don't** let two defect kinds compete for the theater's ink at full strength.

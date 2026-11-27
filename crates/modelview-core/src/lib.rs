@@ -1,4 +1,5 @@
 pub mod analysis;
+pub mod deep_repair;
 pub mod export;
 pub mod loader;
 pub mod mesh;
@@ -10,6 +11,7 @@ pub mod stl;
 pub mod threemf;
 
 pub use analysis::{DefectKind, DefectLine, DefectMarker, MeshReport, Verdict, analyze, summarize};
+pub use deep_repair::{deep_repair_mesh, deep_repair_scene};
 pub use export::{read_project_settings, write_3mf, write_stl};
 pub use loader::{load_bytes, load_path, load_path_recovering};
 pub use mesh::{Bounds, Mesh, smooth_normals, weld};

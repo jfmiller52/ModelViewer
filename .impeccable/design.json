@@ -535,7 +535,7 @@
       "name": "Repair Sheet",
       "kind": "custom",
       "description": "Opaque black plate with before/after counts, safe-pass checkboxes and explicit Keep/Revert/Save/Send actions.",
-      "html": "<div class=\"ds-sheet ds-repair\"><div class=\"ds-kicker\">REPAIR / vase_broken.stl</div><div class=\"ds-metric\"><span>BEFORE</span><b>OPEN 24  WINDING 3  DEGENERATE 0  NON-MANIFOLD 0  SHELLS 1</b></div><div class=\"ds-metric is-clean\"><span>AFTER</span><b>OPEN 0  WINDING 0  DEGENERATE 0  NON-MANIFOLD 0  SHELLS 1</b></div><div class=\"ds-stats\">WELDED 103,487 / DEGENERATE 0 / DUPLICATES 0 / FLIPPED 1 / HOLES 1 / PATCHES 24</div><div class=\"ds-options\"><button class=\"ds-repair-option is-on\"><span></span><b>Weld coincident vertices</b><em>103,487</em></button><button class=\"ds-repair-option is-on\"><span></span><b>Fill boundary holes</b><em>1 LOOPS / 24 PATCHES</em></button></div><p class=\"ds-note\">Boundary holes are patched with a simple fan. Non-manifold edges stay unresolved; self-intersections are not checked.</p><div class=\"ds-actions\"><button class=\"ds-btn-primary\">KEEP REPAIRED</button><button class=\"ds-btn-outline\">REVERT</button></div><div class=\"ds-actions\"><button class=\"ds-btn-outline\">SAVE REPAIRED COPY…</button><button class=\"ds-btn-outline\">SET UP SLICER</button></div></div>",
+      "html": "<div class=\"ds-sheet ds-repair\"><div class=\"ds-kicker\">REPAIR / vase_broken.stl</div><div class=\"ds-metric\"><span>BEFORE</span><b>OPEN 24  WINDING 3  DEGENERATE 0  NON-MANIFOLD 0  SHELLS 1</b></div><div class=\"ds-metric is-clean\"><span>AFTER</span><b>OPEN 0  WINDING 0  DEGENERATE 0  NON-MANIFOLD 0  SHELLS 1</b></div><div class=\"ds-stats\">WELDED 103,487 / DEGENERATE 0 / DUPLICATES 0 / FLIPPED 1 / HOLES 1 / PATCHES 24</div><div class=\"ds-options\"><button class=\"ds-repair-option is-on\"><span></span><b>Weld coincident vertices</b><em>103,487</em></button><button class=\"ds-repair-option is-on\"><span></span><b>Fill boundary holes</b><em>1 LOOPS / 24 PATCHES</em></button></div><p class=\"ds-note\">Boundary holes are patched with a simple fan. Non-manifold joins are split only when the AFTER report improves; remaining joins stay unresolved. Self-intersections are not checked.</p><div class=\"ds-actions\"><button class=\"ds-btn-primary\">KEEP REPAIRED</button><button class=\"ds-btn-outline\">REVERT</button></div><div class=\"ds-actions\"><button class=\"ds-btn-outline\">SAVE REPAIRED COPY…</button><button class=\"ds-btn-outline\">SET UP SLICER</button></div></div>",
       "css": ".ds-repair .ds-metric{display:grid;gap:2px;margin-top:12px}.ds-repair .ds-metric span{font-size:9.5px;font-weight:600;letter-spacing:1.8px;color:#A7B3BF}.ds-repair .ds-metric b{font-size:12px;font-weight:500;color:#A7B3BF}.ds-repair .ds-metric.is-clean b{color:#FFFFFF}.ds-repair .ds-stats{font-size:10px;letter-spacing:.8px;color:#A7B3BF;margin-top:8px}.ds-repair .ds-options{display:grid;gap:0;margin:14px 0 10px}.ds-repair .ds-note{font-family:Archivo,sans-serif;font-size:10.5px;line-height:1.4;color:#A7B3BF;margin:0 0 16px}.ds-repair .ds-actions{display:flex;gap:8px;margin-top:8px}.ds-repair .ds-actions>*{height:36px;border-radius:0;font:600 12.5px/1 \"Archivo Narrow\",sans-serif;letter-spacing:.128em;text-transform:uppercase;cursor:pointer}"
     },
     {
@@ -686,7 +686,7 @@
       },
       {
         "name": "The Safe Claim Rule",
-        "body": "The repair reports only the five safe passes. Non-manifold edges remain reported and self-intersections are not checked; the interface never implies otherwise.",
+        "body": "The repair reports only the six safe passes, each validated against the real AFTER report. A non-manifold split is accepted only when it improves the report without opening new edges; declined passes stay visible. Deep remesh is a separate opt-in rebuild, never counted as a safe pass, and is offered only when the result is watertight. Self-intersections are not checked; the interface never implies otherwise.",
         "section": "colors"
       },
       {
@@ -741,7 +741,8 @@
       "Do show real parse and check timings; label synthetic samples and the STL millimetre assumption.",
       "Do use opaque black sheets with a 1px Hairline Bright border and 0px corners; they are plates, not cards.",
       "Do mark REPAIRED PREVIEW while previewing and REPAIRED only after Keep; disable Keep when no safe pass changed geometry.",
-      "Do state what repair did not heal; non-manifold edges are reported, never claimed fixed.",
+      "Do state what repair did not heal; remaining non-manifold joins are reported, never claimed fixed.",
+      "Do label deep remesh as an opt-in rebuild and warn that detail may change.",
       "Do ghost the specimen, not the defect; keep the focused kind in its ink and the rest of the field quiet.",
       "Do use the White focus frame and the Blue selected-marker ring; no colored disc, halo or bloom.",
       "Do keep the side report live in theater and return the camera on Esc.",
@@ -759,7 +760,8 @@
       "Don't show idle FPS or invented performance numbers.",
       "Don't use warm clay or sodium/warm-yellow accents; the surface is black, white and cool blue.",
       "Don't put a second status stack beside the calibrated rail.",
-      "Don't claim non-manifold healing or self-intersection detection; neither is in the safe repair.",
+      "Don't claim every non-manifold join was healed or that self-intersections are detected; the safe repair is conservative.",
+      "Don't present deep remesh as safe or detail-preserving.",
       "Don't overwrite the source file when saving or sending a repair.",
       "Don't mark a scene repaired when the preview is unchanged.",
       "Don't add particles, bloom, glow, chromatic aberration or idle loops to theater.",

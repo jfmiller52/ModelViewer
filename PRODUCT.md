@@ -35,14 +35,15 @@ Files arrive from model sites, chat, or a colleague's export. The user is mid-ta
 - GPU rendering through wgpu; multi-million-triangle meshes must orbit smoothly.
 - Viewport navigation matches BambuStudio: left-drag orbit, right-drag pan, wheel zoom toward cursor, standard view hotkeys.
 - Slicer handoff: detects Bambu Studio, OrcaSlicer, PrusaSlicer, UltiMaker Cura and a custom app/executable, remembers the choice, and sends the original, the saved repaired copy, or a temporary copy.
-- Safe repair: previewable weld, degenerate/duplicate removal, winding fix and boundary-hole fill for non-watertight scenes; Keep, Revert, save a repaired STL/3MF, or send it. The source is never overwritten.
+- Safe repair: previewable weld, degenerate/duplicate removal, non-manifold join splitting, winding fix and boundary-hole fill for non-watertight scenes, with every pass checked against the AFTER report; Keep, Revert, save a repaired STL/3MF, or send it. The source is never overwritten.
+- Deep repair: an opt-in SDF rebuild for geometry beyond the safe passes. It resamples at roughly diagonal/160, runs safe cleanup, and keeps only a watertight result; sharp detail may change and the source is never overwritten.
 - Defect Theater: `D` or a numbered callout flies the camera to the defect, ghosts the specimen, keeps one defect kind in its ink inside a White focus frame, and docks a topology loupe with local valence, winding arrows and non-manifold knots; `Esc` returns the camera.
 - Defect Theater is a reading of existing analysis, not a new check: the side report stays live and no new printability claims are introduced.
 - No-wait large models: binary STL above a threshold streams a live flat-shaded mesh first, with an analysis filmstrip counting provisional open/manifold/winding/volume/shells/degenerate results; the final smooth scene replaces it when the authoritative report lands.
 - Orientation Adviser: on an assumed 256 × 256 × 256 mm bed, test candidate poses, rank lowest profile, support risk and bed contact, and animate the specimen onto the recommended pose. Preview only; the source file is never rewritten.
 - Large 3MF recovery: if a package cannot open because its objects live in external production parts, offer **FIX ON LOAD**, resolve the parts, preserve plates and object names, skip broken parts, and open the recovered scene in memory. The source is never rewritten.
 - Defined 3MF part colors: Bambu model-settings extruder assignments are matched to project filament colors and shown on the mesh and object-row swatches; undefined parts keep the cool specimen palette. Dark print colors are lifted for the black plate. Repaired/recovered 3MF exports retain the extruder assignment.
-- Repair scope is explicit: non-manifold edges stay reported and unresolved; self-intersections are not detected. The app never claims either was fixed.
+- Repair scope is explicit: non-manifold splits are accepted only when the AFTER report improves without opening new edges; remaining joins stay reported and unresolved, and self-intersections are not detected. Deep repair is a separate opt-in rebuild that changes detail; it is never counted as a safe pass.
 - Targets Windows and macOS; Linux is optional and must not compromise the other two.
 
 ## Brand Commitments
