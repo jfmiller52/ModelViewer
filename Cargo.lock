@@ -2488,7 +2488,7 @@ dependencies = [
 
 [[package]]
 name = "modelview-app"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "bytemuck",
@@ -2505,7 +2505,7 @@ dependencies = [
 
 [[package]]
 name = "modelview-core"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "baby_shark",
